@@ -66,8 +66,7 @@ By integrating data from various sources, such as financial reports, news articl
 ## **Project Structure**
 ```plaintext
 # Project Structure
-```
-plaintext
+
 VILCORPINVESTINGONTOLOGY/
 ├── data_etl_pipeline/              		# ETL pipeline for data processing
 │   ├── __pycache__/                		# Compiled Python files
