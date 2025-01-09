@@ -64,3 +64,124 @@ By integrating data from various sources, such as financial reports, news articl
 ---
 
 ## **Project Structure**
+```plaintext
+project-root/
+├── src/
+│   ├── components/
+│   │   ├── Dashboard.jsx
+│   │   ├── NewsInsights.jsx
+│   │   ├── ComparativeAnalysis.jsx
+│   │   ├── PerformanceOverview.jsx
+│   │   ├── FinancialData.jsx
+│   │   ├── RDFGraphSimplified.jsx
+│   │   ├── RDFGraphDetailed.jsx
+│   ├── App.js
+│   ├── index.js
+│
+├── backend/
+│   ├── app.py           # Flask backend
+│   ├── sparql_queries.py # SPARQL query definitions
+│   ├── data_ingestion.py # Ingestion and RDF transformation
+│
+├── data/
+│   ├── ontology.owl      # Ontology definition in RDF/OWL format
+│   ├── sample_data.ttl   # Sample RDF triples
+│
+├── package.json
+├── README.md
+```
+
+## Installation and Setup
+
+### 1. Prerequisites
+- Node.js and npm
+- Python 3.8+
+- Apache Jena Fuseki
+- Git
+
+### 2. Clone the Repository
+```bash
+# Clone the repository
+git clone https://github.com/your-username/linked-data-visualization.git
+cd linked-data-visualization
+```
+
+### 3. Install Frontend Dependencies
+```bash
+# Navigate to the frontend directory
+cd src
+# Install dependencies
+npm install
+```
+
+### 4. Install Backend Dependencies
+```bash
+# Navigate to the backend directory
+cd backend
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 5. Set Up Apache Jena Fuseki
+1. Download and install Apache Jena Fuseki.
+2. Start the Fuseki server and create a new dataset.
+3. Import `sample_data.ttl` into the triplestore.
+
+### 6. Run the Backend Server
+```bash
+# Start the backend server
+cd backend
+python app.py
+```
+
+### 7. Run the Frontend
+```bash
+# Start the frontend server
+cd src
+npm start
+```
+
+## Usage
+1. Open your browser and navigate to [http://localhost:3000](http://localhost:3000).
+2. Explore the dashboard:
+   - **Simplified View**: Get a high-level overview of company insights.
+   - **Detailed View**: Delve deeper into RDF relationships.
+3. Use filters to focus on specific categories like financial metrics, news, or performance.
+4. Interact with nodes and edges to reveal additional insights.
+
+## Contributions
+Contributions are welcome! To contribute:
+
+1. Fork the repository.
+2. Create a new branch:
+   ```bash
+   git checkout -b feature-name
+   ```
+3. Commit your changes:
+   ```bash
+   git commit -m "Add feature-name"
+   ```
+4. Push to the branch:
+   ```bash
+   git push origin feature-name
+   ```
+5. Open a Pull Request.
+
+## Future Enhancements
+- Implement real-time data updates with live API integration.
+- Optimize performance for large-scale graphs.
+- Add advanced visualizations like heatmaps and time sliders.
+- Enable user-defined queries for custom insights.
+
+## License
+This project is licensed under the [MIT License](LICENSE).
+
+## Contact
+If you have any questions or feedback, feel free to reach out:
+- Email: your-email@example.com
+- LinkedIn: [Your LinkedIn Profile](#)
+
+## Acknowledgments
+Special thanks to the contributors, mentors, and open-source libraries that made this project possible.
+
+
