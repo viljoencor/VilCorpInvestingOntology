@@ -66,55 +66,55 @@ By integrating data from various sources, such as financial reports, news articl
 ## **Project Structure**
 ```plaintext
 # Project Structure
-
-```plaintext
+```
+plaintext
 VILCORPINVESTINGONTOLOGY/
-├── data_etl_pipeline/              # ETL pipeline for data processing
-│   ├── __pycache__/                # Compiled Python files
-│   ├── data_cleaning.py            # Script for cleaning raw data
-│   ├── data_extraction.py          # Script for extracting data from sources
-│   ├── data_loading.py             # Script for loading data into a triplestore
-│   ├── data_scraping.py            # Script for scraping external data sources
-│   ├── data_transformation.py      # Script for transforming data into RDF triples
-│   ├── graph_functions.py          # Helper functions for managing RDF graphs
-│   ├── sentiment_analysis.py       # Script for sentiment analysis on news articles
-│   ├── sparql_queries.py           # SPARQL query definitions
+├── data_etl_pipeline/              		# ETL pipeline for data processing
+│   ├── __pycache__/                		# Compiled Python files
+│   ├── data_cleaning.py            		# Script for cleaning raw data
+│   ├── data_extraction.py          		# Script for extracting data from sources
+│   ├── data_loading.py             		# Script for loading data into a triplestore
+│   ├── data_scraping.py            		# Script for scraping external data sources
+│   ├── data_transformation.py      		# Script for transforming data into RDF triples
+│   ├── graph_functions.py          		# Helper functions for managing RDF graphs
+│   ├── sentiment_analysis.py       		# Script for sentiment analysis on news articles
+│   ├── sparql_queries.py           		# SPARQL query definitions
+│		
+├── flask_api/                      		# Flask API backend
+│   ├── app.py                      		# Flask app entry point
+│		
+├── front-end-app/                  		# Frontend application
+│   ├── node_modules/               		# Node.js modules for React app
+│   ├── public/                     		# Public assets for React app
+│   ├── src/                        		# React source files
+│   │   ├── components/             		# UI components for the frontend
+│   │   │   ├── ComparativeAnalysis.js 	# Component for comparative analysis
+│   │   │   ├── Dashboard.js        		# Main dashboard component
+│   │   │   ├── FinancialData.js    		# Component for financial data insights
+│   │   │   ├── FinancialMetrics.js 		# Component for financial metrics
+│   │   │   ├── LinkedDataVisualization.js 	# Component for linked data visualization
+│   │   │   ├── NewsInsights.js     		# Component for news insights and sentiment
+│   │   │   ├── PerformanceOverview.js 	# Component for performance metrics overview
+│   │   ├── mockData/               		# Mock data for testing UI components
+│   │   ├── services/               		# Service files for API calls
+│   │   ├── App.js                  		# Root React component
+│   │   ├── App.css                 		# Styling for React app
+│   │   ├── App.test.js             		# Unit tests for App component
+│   │   ├── index.js                		# React entry point
+│   │   ├── index.css               		# Global CSS
+│   │   ├── logo.svg                		# Logo asset
+│   │   ├── reportWebVitals.js      		# Performance reporting
+│   │   ├── setupTests.js           		# Test setup
+│   ├── package-lock.json           		# Lockfile for npm dependencies
+│   ├── package.json                		# Frontend npm dependencies
 │
-├── flask_api/                      # Flask API backend
-│   ├── app.py                      # Flask app entry point
-│
-├── front-end-app/                  # Frontend application
-│   ├── node_modules/               # Node.js modules for React app
-│   ├── public/                     # Public assets for React app
-│   ├── src/                        # React source files
-│   │   ├── components/             # UI components for the frontend
-│   │   │   ├── ComparativeAnalysis.js # Component for comparative analysis
-│   │   │   ├── Dashboard.js        # Main dashboard component
-│   │   │   ├── FinancialData.js    # Component for financial data insights
-│   │   │   ├── FinancialMetrics.js # Component for financial metrics
-│   │   │   ├── LinkedDataVisualization.js # Component for linked data visualization
-│   │   │   ├── NewsInsights.js     # Component for news insights and sentiment
-│   │   │   ├── PerformanceOverview.js # Component for performance metrics overview
-│   │   ├── mockData/               # Mock data for testing UI components
-│   │   ├── services/               # Service files for API calls
-│   │   ├── App.js                  # Root React component
-│   │   ├── App.css                 # Styling for React app
-│   │   ├── App.test.js             # Unit tests for App component
-│   │   ├── index.js                # React entry point
-│   │   ├── index.css               # Global CSS
-│   │   ├── logo.svg                # Logo asset
-│   │   ├── reportWebVitals.js      # Performance reporting
-│   │   ├── setupTests.js           # Test setup
-│   ├── package-lock.json           # Lockfile for npm dependencies
-│   ├── package.json                # Frontend npm dependencies
-│
-├── node_modules/                   # Node.js modules for backend
-├── dependency_requirements.txt     # Python requirements for backend
-├── main.py                         # Main entry point for combined pipeline
-├── package-lock.json               # Lockfile for backend npm dependencies
-├── package.json                    # Backend npm dependencies
-├── VilCorpInvestingOntology_data.rdf # RDF data export
-├── VilCorpInvestingOntology.ttl    # Turtle data for ontology
+├── node_modules/                   		# Node.js modules for backend
+├── dependency_requirements.txt     		# Python requirements for backend
+├── main.py                         		# Main entry point for combined pipeline
+├── package-lock.json               		# Lockfile for backend npm dependencies
+├── package.json                    		# Backend npm dependencies
+├── VilCorpInvestingOntology_data.rdf 		# RDF data export
+├── VilCorpInvestingOntology.ttl    		# Turtle data for ontology
 
 ```
 
