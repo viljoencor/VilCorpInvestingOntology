@@ -1,0 +1,11 @@
+yfinance
+beautifulsoup4
+rdflib
+pandas
+selenium
+npm install react-router-dom
+npm install @mui/icons-material
+npm install axios
+npm install web-vitals
+npm install @emotion/react @emotion/styled
+npm install vis-network
