@@ -65,8 +65,6 @@ By integrating data from various sources, such as financial reports, news articl
 
 ## **Project Structure**
 ```plaintext
-# Project Structure
-
 VILCORPINVESTINGONTOLOGY/
 ├── data_etl_pipeline/              		# ETL pipeline for data processing
 │   ├── __pycache__/                		# Compiled Python files
@@ -87,13 +85,13 @@ VILCORPINVESTINGONTOLOGY/
 │   ├── public/                     		# Public assets for React app
 │   ├── src/                        		# React source files
 │   │   ├── components/             		# UI components for the frontend
-│   │   │   ├── ComparativeAnalysis.js 	# Component for comparative analysis
+│   │   │   ├── ComparativeAnalysis.js 		# Component for comparative analysis
 │   │   │   ├── Dashboard.js        		# Main dashboard component
 │   │   │   ├── FinancialData.js    		# Component for financial data insights
 │   │   │   ├── FinancialMetrics.js 		# Component for financial metrics
 │   │   │   ├── LinkedDataVisualization.js 	# Component for linked data visualization
 │   │   │   ├── NewsInsights.js     		# Component for news insights and sentiment
-│   │   │   ├── PerformanceOverview.js 	# Component for performance metrics overview
+│   │   │   ├── PerformanceOverview.js 		# Component for performance metrics overview
 │   │   ├── mockData/               		# Mock data for testing UI components
 │   │   ├── services/               		# Service files for API calls
 │   │   ├── App.js                  		# Root React component
