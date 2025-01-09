@@ -197,6 +197,8 @@ Contributions are welcome! To contribute:
 - Add advanced visualizations like heatmaps and time sliders.
 - Enable user-defined queries for custom insights.
 
+<iframe width="768" height="432" src="https://miro.com/app/live-embed/uXjVLvgMITI=/?moveToViewport=2102,1432,3592,1326&embedId=149403013758" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
+
 ## License
 This project is licensed under the [MIT License](LICENSE).
 
