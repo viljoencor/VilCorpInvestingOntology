@@ -6,6 +6,7 @@ import ComparativeAnalysis from './components/ComparativeAnalysis';
 import PerformanceOverview from './components/PerformanceOverview';
 import FinancialData from './components/FinancialData';
 import LinkedDataVisulazation from './components/LinkedDataVisulazation';
+import InvestmentSummary from './components/InvestmentSummary';
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
         <h1>VilCorp Investing</h1>
         <nav>
           <Link to="/">Dashboard</Link> 
+          | <Link to="/InvestmentSummary">Investment Summary</Link> 
           | <Link to="/news">News Insights</Link> 
           | <Link to="/compare">Comparative Analysis</Link>
           | <Link to="/perform">Performance Overview</Link>
@@ -24,6 +26,7 @@ const App = () => {
       <main>
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/InvestmentSummary" element={<InvestmentSummary />} />
           <Route path="/news" element={<NewsInsights />} />
           <Route path="/compare" element={<ComparativeAnalysis />} />
           <Route path="/perform" element={<PerformanceOverview />} />

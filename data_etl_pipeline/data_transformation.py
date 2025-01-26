@@ -1,5 +1,8 @@
 from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib.namespace import RDF, XSD
+from rdflib.namespace import OWL
+from data_etl_pipeline.sparql_queries import fetch_wikidata_id
+from data_etl_pipeline.graph_funcations import enhance_rdf_with_links
 
 VILCORP = Namespace("http://www.semanticweb.org/viljo/ontologies/2024/10/untitled-ontology-3/")
 
@@ -38,3 +41,14 @@ def create_rdf_graph(stock_data, news_data, financial_metrics, performance_data,
             graph.add((company_uri, VILCORP.hasFinancialMetric, metric_uri))
 
     return graph
+
+
+def create_rdf_graph_with_links(stock_data, news_data, financial_metrics, performance_data, company_name):
+    graph = create_rdf_graph(stock_data, news_data, financial_metrics, performance_data, company_name)
+    
+    # Fetch external identifier (e.g., Wikidata)
+    external_id = fetch_wikidata_id(company_name)
+    company_uri = URIRef(f"{VILCORP}Company/{company_name.replace(' ', '_')}")
+    
+    # Enhance RDF with external links
+    return enhance_rdf_with_links(graph, company_uri, external_id)

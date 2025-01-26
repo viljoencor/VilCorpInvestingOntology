@@ -63,46 +63,7 @@ def get_stock_prices():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# @app.route('/run-pipeline', methods=['POST'])
-# def run_pipeline():
-#     try:
-#         data = request.json
 
-#         required_fields = ['company_name', 'ticker', 'start_date', 'end_date']
-#         missing_fields = [field for field in required_fields if field not in data or not data[field]]
-
-#         if missing_fields:
-#             return jsonify({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
-
-#         company_name = data['company_name']
-#         ticker = data['ticker']
-#         start_date = data['start_date']
-#         end_date = data['end_date']
-
-#         # Step 1: Stock Prices
-#         stock_extractor = StockPriceExtractor(ticker, start_date, end_date)
-#         stock_prices = stock_extractor.fetch_stock_prices()
-#         if isinstance(stock_prices, pd.DataFrame):
-#             stock_prices = stock_prices.to_dict(orient='records')
-
-#         # Step 2: News Articles
-#         news_extractor = NewsAPIExtractor(api_key="d745b20dc64046fb9e52cc8e407427b2", company=company_name, start_date=start_date, end_date=end_date)
-#         news_articles = news_extractor.fetch_news_articles()
-
-#         # Step 3: Financial Metrics
-#         financial_metrics = financial_metrics_query(company_name)
-
-#         # Step 4: Performance Overview
-#         performance_overview = performance_overview_query(company_name)
-
-#         return jsonify({
-#             "stock_prices": stock_prices,
-#             "news_insights": news_articles,
-#             "financial_metrics": financial_metrics,
-#             "performance_overview": performance_overview
-#         })
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
 
 @app.route('/run-pipeline', methods=['POST'])
 def run_pipeline():

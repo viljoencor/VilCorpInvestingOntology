@@ -58,7 +58,6 @@ def news_sentiment_query(company_name, min_sentiment=-1.0, max_sentiment=1.0):
     
     return result
 
-
 def stock_price_query(start_date, end_date):
     """
     Fetches stock price data over a specific date range.
@@ -92,6 +91,38 @@ def performance_overview_query(company_name):
     """
     return execute_sparql_query(query)
 
+def fetch_wikidata_id(company_name):
+    query = f"""
+    SELECT ?entity ?label WHERE {{
+      ?entity rdfs:label "{company_name}"@en .
+      FILTER(CONTAINS(STR(?entity), "wikidata.org/entity"))
+    }}
+    LIMIT 1
+    """
+    url = "https://query.wikidata.org/sparql"
+    headers = {'Accept': 'application/json'}
+    response = requests.get(url, params={'query': query}, headers=headers)
+    
+    if response.status_code == 200:
+        data = response.json()
+        if data['results']['bindings']:
+            return data['results']['bindings'][0]['entity']['value']
+    return None
+
+def linked_data_query(company_name):
+    """
+    Fetches linked data URIs for a company.
+    """
+    query = f"""
+    PREFIX owl: <http://www.w3.org/2002/07/owl#>
+    SELECT ?linkedURI WHERE {{
+        ?company rdf:type vilcorp:Company ;
+                 vilcorp:hasName "{company_name}" ;
+                 owl:sameAs ?linkedURI .
+    }}
+    """
+    return execute_sparql_query(query)
+
 # Utility function to pretty-print results
 def print_results(query_results, columns):
     """
@@ -111,31 +142,3 @@ def print_results(query_results, columns):
     else:
         print("No results found.")
 
-# Example Usage
-if __name__ == "__main__":
-    try:
-        # Financial Metrics Query
-        company = "Capitec Bank"
-        print(f"Financial Metrics for {company}:")
-        metrics = financial_metrics_query(company)
-        print_results(metrics, ["metricName", "metricValue", "metricUnit"])
-
-        # News Sentiment Query
-        print(f"\nNews Sentiment for {company}:")
-        sentiment = news_sentiment_query(company, min_sentiment=0.0)
-        print_results(sentiment, ["headline", "publicationDate", "sentimentScore"])
-
-        # Stock Price Query
-        start_date = "2024-11-05"
-        end_date = "2024-11-15"
-        print(f"\nStock Prices between {start_date} and {end_date}:")
-        stock_prices = stock_price_query(start_date, end_date)
-        print_results(stock_prices, ["date", "price", "volume"])
-
-        # Performance Overview Query
-        print(f"\nPerformance Overview for {company}:")
-        performance = performance_overview_query(company)
-        print_results(performance, ["period", "cpiReturn", "indexReturn"])
-
-    except Exception as e:
-        print(f"Error: {e}")
