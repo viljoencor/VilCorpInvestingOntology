@@ -1,40 +1,86 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import Dashboard from './components/Dashboard';
-import NewsInsights from './components/NewsInsights';
+import { Route, Routes, Link, useLocation } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Tabs, Tab, Container, Box, Paper } from '@mui/material';
+import { motion } from 'framer-motion';
 import ComparativeAnalysis from './components/ComparativeAnalysis';
-import PerformanceOverview from './components/PerformanceOverview';
-import FinancialData from './components/FinancialData';
-import LinkedDataVisulazation from './components/LinkedDataVisulazation';
-import InvestmentSummary from './components/InvestmentSummary';
+//import LinkedDataVisualization from './components/LinkedDataVisualization';
+import AnalysisPrediction from './components/AnalysisPrediction';
+import MonteCarloSimulation from "./components/MonteCarloSimulation";
+import FinancialOntologyGraph from './components/FinancialOntologyGraph'; // Import Ontology Graph
 
+
+// ✅ Define Routes Properly
+const routes = [
+  { path: "/", label: "Investment Analysis", component: <ComparativeAnalysis /> },
+  // { path: "/linkdataviz", label: "Linked Data Visualization", component: <LinkedDataVisualization /> },
+  { path: "/predict", label: "Analysis Prediction", component: <AnalysisPrediction /> },
+  { path: "/montecarlo", label: "Monte Carlo Simulation", component: <MonteCarloSimulation /> },
+  { path: "/ontology", label: "Financial Ontology Graph", component: <FinancialOntologyGraph /> }
+];
+
+
+// ✅ Navigation Bar Component
+const Navigation = () => {
+  const location = useLocation();
+  const currentTab = routes.findIndex(route => route.path === location.pathname);
+
+  return (
+    <AppBar position="sticky" sx={{ background: "#1e1e1e", boxShadow: "none" }}>
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Typography variant="h5" sx={{ fontWeight: "bold", color: "#ffcc00" }}>
+          📈 VilCorp Investing
+        </Typography>
+        <Tabs value={currentTab >= 0 ? currentTab : 0} textColor="inherit" indicatorColor="secondary">
+          {routes.map((route, index) => (
+            <Tab
+              key={index}
+              label={route.label}
+              component={Link}
+              to={route.path}
+              sx={{ fontWeight: "bold", color: "#fff", "&.Mui-selected": { color: "#ffcc00" } }}
+            />
+          ))}
+        </Tabs>
+      </Toolbar>
+    </AppBar>
+  );
+};
+
+// ✅ Main App Component (No <Router> here)
 const App = () => {
   return (
-    <Router>
-      <header>
-        <h1>VilCorp Investing</h1>
-        <nav>
-          <Link to="/">Dashboard</Link> 
-          | <Link to="/InvestmentSummary">Investment Summary</Link> 
-          | <Link to="/news">News Insights</Link> 
-          | <Link to="/compare">Comparative Analysis</Link>
-          | <Link to="/perform">Performance Overview</Link>
-          | <Link to="/findata">Financial Data</Link>
-          | <Link to="/linkdataviz">Linked Data Visulazation</Link>
-        </nav>
-      </header>
-      <main>
+    <>
+      <Navigation />
+      <Container maxWidth={false} sx={{ maxWidth: "100%", width: "100%", padding: "20px" }}>
+      <Box
+        component={motion.div}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "80vh",
+          paddingTop: "20px",
+        }}
+      >
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/InvestmentSummary" element={<InvestmentSummary />} />
-          <Route path="/news" element={<NewsInsights />} />
-          <Route path="/compare" element={<ComparativeAnalysis />} />
-          <Route path="/perform" element={<PerformanceOverview />} />
-          <Route path="/findata" element={<FinancialData />} />
-          <Route path="/linkdataviz" element={<LinkedDataVisulazation />} />
+          {routes.map((route, index) => (
+            <Route key={index} path={route.path} element={route.component} />
+          ))}
         </Routes>
-      </main>
-    </Router>
+      </Box>
+    </Container>
+
+      {/* ✅ Footer */}
+      <Paper elevation={0} sx={{ textAlign: "center", padding: "20px", marginTop: "40px", background: "#1e1e1e" }}>
+        <Typography variant="body2" color="#ffcc00">
+          © {new Date().getFullYear()} VilCorp Investing. All Rights Reserved.
+        </Typography>
+      </Paper>
+    </>
   );
 };
 

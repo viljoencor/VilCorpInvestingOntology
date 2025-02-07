@@ -1,0 +1,55 @@
+@prefix ex: <http://example.org/finance#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+# Ontology Definition
+ex:FinancialOntology rdf:type owl:Ontology .
+
+# 🔹 Defining Entities
+ex:Company rdf:type owl:Class .
+ex:StockPrice rdf:type owl:Class .
+ex:FinancialMetric rdf:type owl:Class .
+ex:MarketSentiment rdf:type owl:Class .
+ex:EconomicIndicator rdf:type owl:Class .
+ex:InvestorProfile rdf:type owl:Class .
+
+# 🔗 Defining Relationships
+ex:hasFinancialMetric rdf:type owl:ObjectProperty ;
+                      rdfs:domain ex:Company ;
+                      rdfs:range ex:FinancialMetric .
+
+ex:hasStockPrice rdf:type owl:ObjectProperty ;
+                 rdfs:domain ex:Company ;
+                 rdfs:range ex:StockPrice .
+
+ex:influences rdf:type owl:ObjectProperty ;
+              rdfs:domain ex:MarketSentiment ;
+              rdfs:range ex:StockPrice .
+
+ex:affects rdf:type owl:ObjectProperty ;
+           rdfs:domain ex:EconomicIndicator ;
+           rdfs:range ex:CompanyPerformance .
+
+ex:determines rdf:type owl:ObjectProperty ;
+              rdfs:domain ex:InvestorProfile ;
+              rdfs:range ex:InvestmentStrategy .
+
+# 🔹 Sample Data for Microsoft (MSFT)
+ex:Microsoft rdf:type ex:Company ;
+             ex:hasFinancialMetric ex:MSFT_Revenue, ex:MSFT_PE_Ratio ;
+             ex:hasStockPrice ex:MSFT_StockPrice_2025 .
+
+ex:MSFT_Revenue rdf:type ex:FinancialMetric ;
+                ex:metricName "Revenue" ;
+                ex:metricValue "211.91B"^^xsd:float ;
+                ex:metricUnit "USD" .
+
+ex:MSFT_PE_Ratio rdf:type ex:FinancialMetric ;
+                 ex:metricName "P/E Ratio" ;
+                 ex:metricValue "34.6"^^xsd:float .
+
+ex:MSFT_StockPrice_2025 rdf:type ex:StockPrice ;
+                        ex:priceDate "2025-02-06"^^xsd:date ;
+                        ex:priceValue "350.25"^^xsd:float ;
+                        ex:currency "USD" .
