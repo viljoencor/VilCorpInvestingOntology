@@ -4,35 +4,39 @@ import pandas as pd
 
 class StockPriceExtractor:
     def __init__(self, ticker, start_date, end_date):
-        """
-        Initializes the StockPriceExtractor with the required parameters.
-        """
+        """Initializes the StockPriceExtractor."""
         self.ticker = ticker
         self.start_date = start_date
         self.end_date = end_date
 
     def validate_inputs(self):
-        """
-        Validates the inputs to ensure they are valid.
-        """
+        """Validates inputs to ensure they are valid."""
         if not self.ticker:
             raise ValueError("Ticker is required to fetch stock prices.")
         if self.start_date and self.end_date and self.start_date > self.end_date:
             raise ValueError("Start date must be before end date.")
 
     def fetch_stock_prices(self, period="1y"):
-        """
-        Fetches stock prices for a given period (e.g., 6M, 1Y, 2Y, 3Y, 5Y, 10Y).
-        """
-        stock = yf.Ticker(self.ticker)
-        historical_data = stock.history(period=period)
+        """Fetches stock prices and ensures output is always a DataFrame."""
+        try:
+            stock = yf.Ticker(self.ticker)
+            historical_data = stock.history(period=period)
 
-        if historical_data.empty:
-            return {"error": f"No stock price data found for {self.ticker}."}
+            # ✅ Check if data is empty
+            if historical_data.empty:
+                print(f"⚠️ No stock price data found for {self.ticker}. Returning empty DataFrame.")
+                return pd.DataFrame(columns=["isRecordedOn", "priceValue", "volume"])
 
-        historical_data.reset_index(inplace=True)
-        historical_data.rename(columns={"Date": "isRecordedOn", "Close": "priceValue", "Volume": "volume"}, inplace=True)
-        return historical_data[["isRecordedOn", "priceValue", "volume"]].to_dict(orient="records")
+            # ✅ Ensure DataFrame format
+            historical_data.reset_index(inplace=True)
+            historical_data.rename(columns={"Date": "isRecordedOn", "Close": "priceValue", "Volume": "volume"}, inplace=True)
+
+            return historical_data[["isRecordedOn", "priceValue", "volume"]]
+
+        except Exception as e:
+            print(f"🚨 ERROR fetching stock prices for {self.ticker}: {e}")
+            return pd.DataFrame(columns=["isRecordedOn", "priceValue", "volume"])  # ✅ Always return DataFrame
+
 
 
 class NewsAPIExtractor:

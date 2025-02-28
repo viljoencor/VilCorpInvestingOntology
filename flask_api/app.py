@@ -121,34 +121,35 @@ def run_pipeline():
         start_date = data['start_date']
         end_date = data['end_date']
 
-        # Fetch stock prices
+        # ✅ Fetch stock prices (Ensures it returns a DataFrame)
         stock_extractor = StockPriceExtractor(ticker, start_date, end_date)
         stock_prices = stock_extractor.fetch_stock_prices()
 
-        # ✅ Debug: Print the type and structure of stock_prices
+        # ✅ Debugging Print
         print(f"DEBUG: stock_prices type: {type(stock_prices)}")
-        print(f"DEBUG: stock_prices content: {stock_prices[:5] if isinstance(stock_prices, list) else stock_prices.head()}")
 
-        if isinstance(stock_prices, list):  # Ensure stock_prices is a DataFrame
-            stock_prices = pd.DataFrame(stock_prices)
+        # ✅ Ensure stock_prices is a DataFrame
+        if not isinstance(stock_prices, pd.DataFrame):
+            print("🚨 ERROR: Expected DataFrame but got:", type(stock_prices))
+            return jsonify({"error": "Internal Server Error: Stock Prices Data Issue"}), 500
 
-        # Fix potential list indexing error
+        # ✅ Fix potential list indexing error
         if "isRecordedOn" in stock_prices:
             stock_prices["isRecordedOn"] = pd.to_datetime(stock_prices["isRecordedOn"]).dt.tz_localize(None)
 
-        # Fetch news articles
+        # ✅ Fetch news articles
         news_extractor = NewsAPIExtractor(api_key="d745b20dc64046fb9e52cc8e407427b2", company=company_name, start_date=start_date, end_date=end_date)
         news_articles = clean_news_articles(news_extractor.fetch_news_articles(), company_name)
 
-        # Fetch financial metrics
+        # ✅ Fetch financial metrics
         yahoo_extractor = YahooFinanceExtractor(ticker)
         financial_metrics = yahoo_extractor.fetch_financial_metrics()
 
-        # Fetch performance overview
+        # ✅ Fetch performance overview
         performance_overview = yahoo_extractor.fetch_performance_overview()
 
         return jsonify({
-            "stock_prices": stock_prices.to_dict(orient="records"),
+            "stock_prices": stock_prices.to_dict(orient="records"),  # ✅ Always return list
             "news_insights": news_articles,
             "financial_metrics": financial_metrics,
             "performance_overview": performance_overview
@@ -156,6 +157,7 @@ def run_pipeline():
     except Exception as e:
         print(f"ERROR: {str(e)}")  # Debugging print
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/financial-statistics', methods=['GET'])
 def get_financial_statistics():
@@ -440,188 +442,188 @@ def monte_carlo_simulation():
 
 
 
-@app.route('/financial-ontology', methods=['GET'])
-def get_financial_ontology():
-    try:
-        tickers = request.args.get('tickers', 'AAPL,TSLA,GOOG').split(',')
-        ontology_data = {"nodes": [], "edges": []}
+# @app.route('/financial-ontology', methods=['GET'])
+# def get_financial_ontology():
+#     try:
+#         tickers = request.args.get('tickers', 'AAPL,TSLA,GOOG').split(',')
+#         ontology_data = {"nodes": [], "edges": []}
 
-        for ticker in tickers:
-            stock = yf.Ticker(ticker)
-            company_name = stock.info.get("shortName", ticker)
-            pe_ratio = stock.info.get("trailingPE", "N/A")
-            revenue = stock.info.get("totalRevenue", "N/A")
-            market_cap = stock.info.get("marketCap", "N/A")
-            stock_price = stock.info.get("currentPrice", "N/A")
-            market_sentiment = "Positive" if stock.info.get("recommendationKey") == "buy" else "Neutral"
+#         for ticker in tickers:
+#             stock = yf.Ticker(ticker)
+#             company_name = stock.info.get("shortName", ticker)
+#             pe_ratio = stock.info.get("trailingPE", "N/A")
+#             revenue = stock.info.get("totalRevenue", "N/A")
+#             market_cap = stock.info.get("marketCap", "N/A")
+#             stock_price = stock.info.get("currentPrice", "N/A")
+#             market_sentiment = "Positive" if stock.info.get("recommendationKey") == "buy" else "Neutral"
 
-            # Add company node
-            ontology_data["nodes"].append({"id": ticker, "label": ticker, "title": company_name, "shape": "box", "color": "#4caf50"})
+#             # Add company node
+#             ontology_data["nodes"].append({"id": ticker, "label": ticker, "title": company_name, "shape": "box", "color": "#4caf50"})
 
-            # Add financial metric nodes
-            if pe_ratio != "N/A":
-                ontology_data["nodes"].append({"id": f"{ticker}_pe", "label": "P/E Ratio", "title": f"P/E: {pe_ratio}", "color": "#ff9800"})
-                ontology_data["edges"].append({"from": ticker, "to": f"{ticker}_pe", "label": "has metric"})
+#             # Add financial metric nodes
+#             if pe_ratio != "N/A":
+#                 ontology_data["nodes"].append({"id": f"{ticker}_pe", "label": "P/E Ratio", "title": f"P/E: {pe_ratio}", "color": "#ff9800"})
+#                 ontology_data["edges"].append({"from": ticker, "to": f"{ticker}_pe", "label": "has metric"})
 
-            if revenue != "N/A":
-                ontology_data["nodes"].append({"id": f"{ticker}_rev", "label": "Revenue", "title": f"Revenue: ${revenue:,}", "color": "#ffeb3b"})
-                ontology_data["edges"].append({"from": ticker, "to": f"{ticker}_rev", "label": "has metric"})
+#             if revenue != "N/A":
+#                 ontology_data["nodes"].append({"id": f"{ticker}_rev", "label": "Revenue", "title": f"Revenue: ${revenue:,}", "color": "#ffeb3b"})
+#                 ontology_data["edges"].append({"from": ticker, "to": f"{ticker}_rev", "label": "has metric"})
 
-            if market_cap != "N/A":
-                ontology_data["nodes"].append({"id": f"{ticker}_cap", "label": "Market Cap", "title": f"Market Cap: ${market_cap:,}", "color": "#2196f3"})
-                ontology_data["edges"].append({"from": ticker, "to": f"{ticker}_cap", "label": "has market cap"})
+#             if market_cap != "N/A":
+#                 ontology_data["nodes"].append({"id": f"{ticker}_cap", "label": "Market Cap", "title": f"Market Cap: ${market_cap:,}", "color": "#2196f3"})
+#                 ontology_data["edges"].append({"from": ticker, "to": f"{ticker}_cap", "label": "has market cap"})
 
-            if stock_price != "N/A":
-                ontology_data["nodes"].append({"id": f"{ticker}_price", "label": "Stock Price", "title": f"Current Price: ${stock_price}", "color": "#00bcd4"})
-                ontology_data["edges"].append({"from": ticker, "to": f"{ticker}_price", "label": "has stock price"})
+#             if stock_price != "N/A":
+#                 ontology_data["nodes"].append({"id": f"{ticker}_price", "label": "Stock Price", "title": f"Current Price: ${stock_price}", "color": "#00bcd4"})
+#                 ontology_data["edges"].append({"from": ticker, "to": f"{ticker}_price", "label": "has stock price"})
 
-            # Sentiment node with color
-            sentiment_color = "#9c27b0" if market_sentiment == "Positive" else "#d32f2f"
-            ontology_data["nodes"].append({"id": f"{ticker}_sentiment", "label": "Market Sentiment", "title": market_sentiment, "color": sentiment_color})
-            ontology_data["edges"].append({"from": ticker, "to": f"{ticker}_sentiment", "label": "has sentiment"})
+#             # Sentiment node with color
+#             sentiment_color = "#9c27b0" if market_sentiment == "Positive" else "#d32f2f"
+#             ontology_data["nodes"].append({"id": f"{ticker}_sentiment", "label": "Market Sentiment", "title": market_sentiment, "color": sentiment_color})
+#             ontology_data["edges"].append({"from": ticker, "to": f"{ticker}_sentiment", "label": "has sentiment"})
 
-        return jsonify(ontology_data)
+#         return jsonify(ontology_data)
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-# Define RDF Namespace
-EX = Namespace("http://www.semanticweb.org/viljo/ontologies/2024/10/untitled-ontology-3/")
-
-# Function to generate RDF data dynamically
-def generate_rdf_for_stock(ticker, years):
-    g = Graph()
-
-    # Define company entity
-    company_uri = URIRef(EX + ticker)
-
-    # Fetch stock price data dynamically
-    stock = yf.Ticker(ticker)
-    historical_data = stock.history(period=f"{years}y")
-
-    if historical_data.empty:
-        return None  # No data available
-
-    for index, row in historical_data.iterrows():
-        stock_uri = URIRef(EX + f"{ticker}_Stock_{index.date()}")
-        g.add((stock_uri, RDF.type, EX.StockPrice))
-        g.add((stock_uri, EX.priceDate, Literal(index.date(), datatype=XSD.date)))
-        g.add((stock_uri, EX.priceValue, Literal(row["Close"], datatype=XSD.float)))
-        g.add((stock_uri, EX.currency, Literal("USD")))
-
-    # Fetch financial metrics dynamically
-    stock_info = stock.info
-    pe_ratio = stock_info.get("trailingPE", None)
-    revenue = stock_info.get("totalRevenue", None)
-
-    if pe_ratio:
-        pe_metric_uri = URIRef(EX + f"{ticker}_PE")
-        g.add((pe_metric_uri, RDF.type, EX.FinancialMetric))
-        g.add((pe_metric_uri, EX.metricName, Literal("P/E Ratio")))
-        g.add((pe_metric_uri, EX.metricValue, Literal(pe_ratio, datatype=XSD.float)))
-
-    if revenue:
-        revenue_metric_uri = URIRef(EX + f"{ticker}_Revenue")
-        g.add((revenue_metric_uri, RDF.type, EX.FinancialMetric))
-        g.add((revenue_metric_uri, EX.metricName, Literal("Total Revenue")))
-        g.add((revenue_metric_uri, EX.metricValue, Literal(revenue, datatype=XSD.float)))
-
-    return g.serialize(format="turtle")
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 
-# Flask API Endpoint for SPARQL Querying
-@app.route('/sparql', methods=['POST'])
-def sparql_query():
-    try:
-        query = request.json.get("query")
-        if not query:
-            return jsonify({"error": "No query provided"}), 400
+# # Define RDF Namespace
+# EX = Namespace("http://www.semanticweb.org/viljo/ontologies/2024/10/untitled-ontology-3/")
 
-        # Load RDF data into a local SPARQL endpoint
-        g = Graph()
-        g.parse(data=generate_rdf_for_stock("AAPL", 5), format="turtle")
+# # Function to generate RDF data dynamically
+# def generate_rdf_for_stock(ticker, years):
+#     g = Graph()
 
-        # Execute SPARQL Query
-        result = g.query(query)
-        response = [{"metric": str(row.metric), "value": str(row.value)} for row in result]
+#     # Define company entity
+#     company_uri = URIRef(EX + ticker)
 
-        return jsonify(response)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+#     # Fetch stock price data dynamically
+#     stock = yf.Ticker(ticker)
+#     historical_data = stock.history(period=f"{years}y")
+
+#     if historical_data.empty:
+#         return None  # No data available
+
+#     for index, row in historical_data.iterrows():
+#         stock_uri = URIRef(EX + f"{ticker}_Stock_{index.date()}")
+#         g.add((stock_uri, RDF.type, EX.StockPrice))
+#         g.add((stock_uri, EX.priceDate, Literal(index.date(), datatype=XSD.date)))
+#         g.add((stock_uri, EX.priceValue, Literal(row["Close"], datatype=XSD.float)))
+#         g.add((stock_uri, EX.currency, Literal("USD")))
+
+#     # Fetch financial metrics dynamically
+#     stock_info = stock.info
+#     pe_ratio = stock_info.get("trailingPE", None)
+#     revenue = stock_info.get("totalRevenue", None)
+
+#     if pe_ratio:
+#         pe_metric_uri = URIRef(EX + f"{ticker}_PE")
+#         g.add((pe_metric_uri, RDF.type, EX.FinancialMetric))
+#         g.add((pe_metric_uri, EX.metricName, Literal("P/E Ratio")))
+#         g.add((pe_metric_uri, EX.metricValue, Literal(pe_ratio, datatype=XSD.float)))
+
+#     if revenue:
+#         revenue_metric_uri = URIRef(EX + f"{ticker}_Revenue")
+#         g.add((revenue_metric_uri, RDF.type, EX.FinancialMetric))
+#         g.add((revenue_metric_uri, EX.metricName, Literal("Total Revenue")))
+#         g.add((revenue_metric_uri, EX.metricValue, Literal(revenue, datatype=XSD.float)))
+
+#     return g.serialize(format="turtle")
 
 
-def store_rdf_in_fuseki(graph):
-    fuseki_url = "http://localhost:3030/rdf-finance/data"
-    headers = {"Content-Type": "text/turtle"}
-    response = requests.post(fuseki_url, data=graph.serialize(format="turtle"), headers=headers)
-    return response.status_code
+# # Flask API Endpoint for SPARQL Querying
+# @app.route('/sparql', methods=['POST'])
+# def sparql_query():
+#     try:
+#         query = request.json.get("query")
+#         if not query:
+#             return jsonify({"error": "No query provided"}), 400
 
-@app.route('/rdf-store', methods=['POST'])
-def store_rdf():
-    ticker = request.json.get("ticker")
-    years = request.json.get("years", 5)
+#         # Load RDF data into a local SPARQL endpoint
+#         g = Graph()
+#         g.parse(data=generate_rdf_for_stock("AAPL", 5), format="turtle")
+
+#         # Execute SPARQL Query
+#         result = g.query(query)
+#         response = [{"metric": str(row.metric), "value": str(row.value)} for row in result]
+
+#         return jsonify(response)
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
+
+# def store_rdf_in_fuseki(graph):
+#     fuseki_url = "http://localhost:3030/rdf-finance/data"
+#     headers = {"Content-Type": "text/turtle"}
+#     response = requests.post(fuseki_url, data=graph.serialize(format="turtle"), headers=headers)
+#     return response.status_code
+
+# @app.route('/rdf-store', methods=['POST'])
+# def store_rdf():
+#     ticker = request.json.get("ticker")
+#     years = request.json.get("years", 5)
     
-    rdf_data = generate_rdf_for_stock(ticker, years)
-    if rdf_data is None:
-        return jsonify({"error": "No data available"}), 404
+#     rdf_data = generate_rdf_for_stock(ticker, years)
+#     if rdf_data is None:
+#         return jsonify({"error": "No data available"}), 404
     
-    status = store_rdf_in_fuseki(rdf_data)
-    return jsonify({"status": "success", "stored": status == 200})
+#     status = store_rdf_in_fuseki(rdf_data)
+#     return jsonify({"status": "success", "stored": status == 200})
 
 
-# ✅ Helper function to convert RDF Turtle to JSON for frontend visualization
-def parse_rdf_to_json(rdf_data):
-    g = rdflib.Graph()
-    g.parse(data=rdf_data, format="turtle")
+# # ✅ Helper function to convert RDF Turtle to JSON for frontend visualization
+# def parse_rdf_to_json(rdf_data):
+#     g = rdflib.Graph()
+#     g.parse(data=rdf_data, format="turtle")
 
-    json_data = {"nodes": [], "edges": []}
-    node_labels = {}
+#     json_data = {"nodes": [], "edges": []}
+#     node_labels = {}
 
-    for subj, pred, obj in g:
-        subj_id = str(subj).split("/")[-1]  # Extract entity name
-        pred_label = str(pred).split("/")[-1]
-        obj_id = str(obj).split("/")[-1] if isinstance(obj, rdflib.URIRef) else str(obj)
+#     for subj, pred, obj in g:
+#         subj_id = str(subj).split("/")[-1]  # Extract entity name
+#         pred_label = str(pred).split("/")[-1]
+#         obj_id = str(obj).split("/")[-1] if isinstance(obj, rdflib.URIRef) else str(obj)
 
-        # ✅ Add Nodes
-        if subj_id not in node_labels:
-            node_labels[subj_id] = {"id": subj_id, "label": subj_id, "color": "blue"}
+#         # ✅ Add Nodes
+#         if subj_id not in node_labels:
+#             node_labels[subj_id] = {"id": subj_id, "label": subj_id, "color": "blue"}
 
-        # ✅ Append Financial Data to Node Labels
-        if pred_label in ["priceValue", "metricValue"]:
-            node_labels[subj_id]["label"] += f"\n{pred_label}: {obj_id}"
+#         # ✅ Append Financial Data to Node Labels
+#         if pred_label in ["priceValue", "metricValue"]:
+#             node_labels[subj_id]["label"] += f"\n{pred_label}: {obj_id}"
 
-        # ✅ Create Edges (Links Between Data)
-        if isinstance(obj, rdflib.URIRef):
-            json_data["edges"].append({"from": subj_id, "to": obj_id, "label": pred_label})
+#         # ✅ Create Edges (Links Between Data)
+#         if isinstance(obj, rdflib.URIRef):
+#             json_data["edges"].append({"from": subj_id, "to": obj_id, "label": pred_label})
 
-    json_data["nodes"] = list(node_labels.values())
-    return json_data
+#     json_data["nodes"] = list(node_labels.values())
+#     return json_data
 
-# ✅ Flask API Endpoint to Serve RDF as JSON
-@app.route("/rdf-stock-data", methods=["GET"])
-def get_rdf_stock_data():
-    try:
-        ticker = request.args.get("ticker")
-        years = int(request.args.get("years", 5))
+# # ✅ Flask API Endpoint to Serve RDF as JSON
+# @app.route("/rdf-stock-data", methods=["GET"])
+# def get_rdf_stock_data():
+#     try:
+#         ticker = request.args.get("ticker")
+#         years = int(request.args.get("years", 5))
 
-        # ✅ Simulated RDF Data (Replace with Dynamic Generation)
-        rdf_data = generate_rdf_for_stock(ticker, years)
+#         # ✅ Simulated RDF Data (Replace with Dynamic Generation)
+#         rdf_data = generate_rdf_for_stock(ticker, years)
 
-        if rdf_data is None:
-            return jsonify({"error": "No stock data available"}), 404
+#         if rdf_data is None:
+#             return jsonify({"error": "No stock data available"}), 404
 
-        # ✅ Convert RDF to JSON for the frontend
-        json_data = parse_rdf_to_json(rdf_data)
+#         # ✅ Convert RDF to JSON for the frontend
+#         json_data = parse_rdf_to_json(rdf_data)
 
-        # ✅ Return RDF or JSON based on request
-        if request.headers.get("Accept") == "application/json":
-            return jsonify(json_data)
-        else:
-            return rdf_data, 200, {"Content-Type": "text/turtle"}
+#         # ✅ Return RDF or JSON based on request
+#         if request.headers.get("Accept") == "application/json":
+#             return jsonify(json_data)
+#         else:
+#             return rdf_data, 200, {"Content-Type": "text/turtle"}
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 
 
