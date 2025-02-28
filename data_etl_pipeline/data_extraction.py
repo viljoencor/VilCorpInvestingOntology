@@ -37,8 +37,6 @@ class StockPriceExtractor:
             print(f"🚨 ERROR fetching stock prices for {self.ticker}: {e}")
             return pd.DataFrame(columns=["isRecordedOn", "priceValue", "volume"])  # ✅ Always return DataFrame
 
-
-
 class NewsAPIExtractor:
     def __init__(self, api_key, company, start_date, end_date):
         self.api_key = api_key

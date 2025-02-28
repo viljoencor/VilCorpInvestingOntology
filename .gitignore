@@ -10,6 +10,7 @@
 
 # production
 /build
+/rdf_data
 
 # misc
 .DS_Store

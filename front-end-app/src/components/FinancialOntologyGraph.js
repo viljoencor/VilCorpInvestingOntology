@@ -1,43 +1,62 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Box, Paper, Divider, CircularProgress } from "@mui/material";
+import { Container, Typography, Box, Paper, CircularProgress, TextField, Button } from "@mui/material";
 import axios from "axios";
 import Plot from "react-plotly.js";
 import { Network } from "vis-network/standalone/esm/vis-network";
 
 const OntologyStockGraph = () => {
   const [selectedCompany, setSelectedCompany] = useState(null);
-  const [stockPrices, setStockPrices] = useState([]);
+  //const [stockPrices, setStockPrices] = useState([]);
   const [financialMetrics, setFinancialMetrics] = useState({});
+  const [investmentInsights, setInvestmentInsights] = useState(""); // AI-Generated Insights
   const [loadingStock, setLoadingStock] = useState(false);
   const [loadingMetrics, setLoadingMetrics] = useState(false);
+  const [loadingInsights, setLoadingInsights] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [showResults, setShowResults] = useState(false); // Controls visibility
+  const [rdfData, setRdfData] = useState(null);
+  const [ticker, setTicker] = useState("");
+  const [years, setYears] = useState(5);
+  const [loading, setLoading] = useState(false);
+  const [stockPrices, setStockPrices] = useState(null);
 
-  // Fetch stock prices from API
+  // ✅ Fetch stock prices
   const fetchStockPrices = async (ticker) => {
     try {
       setLoadingStock(true);
-      const endDate = new Date().toISOString().split("T")[0];
-      const startDate = new Date();
-      startDate.setFullYear(startDate.getFullYear() - 2);
-      const formattedStartDate = startDate.toISOString().split("T")[0];
-
-      const response = await axios.get(
-        `http://localhost:5000/stock-prices?ticker=${ticker}&start_date=${formattedStartDate}&end_date=${endDate}`
-      );
-
-      setStockPrices(response.data);
-      setLoadingStock(false);
+      const response = await axios.get(`http://localhost:5000/stock-prices?ticker=${ticker}`);
+  
+      if (response.data.error) {
+        console.error("⚠️ Stock Price API Error:", response.data.error);
+        setStockPrices([]);
+      } else {
+        setStockPrices(response.data);
+      }
     } catch (error) {
-      console.error("Error fetching stock prices:", error);
+      console.error("❌ Error fetching stock prices:", error);
+      setStockPrices([]);
+    } finally {
       setLoadingStock(false);
     }
   };
 
-  // Fetch financial metrics from API
-  const fetchFinancialMetrics = async (companyName) => {
+  // ✅ Fetch financial metrics using company name
+  const fetchFinancialMetrics = async (ticker) => {
     try {
       setLoadingMetrics(true);
-      const response = await axios.get(`http://localhost:5000/financial-metrics?company=${companyName}`);
-      setFinancialMetrics(response.data);
+      const response = await axios.get(`http://localhost:5000/rdf-stock-data?ticker=${ticker}`);
+
+      if (response.data.results && response.data.results.bindings.length > 0) {
+        const metrics = response.data.results.bindings.reduce((acc, item) => {
+          acc[item.metricName.value] = item.metricValue.value;
+          return acc;
+        }, {});
+        setFinancialMetrics(metrics);
+      } else {
+        setFinancialMetrics({});
+      }
+
       setLoadingMetrics(false);
     } catch (error) {
       console.error("Error fetching financial metrics:", error);
@@ -45,121 +64,155 @@ const OntologyStockGraph = () => {
     }
   };
 
-  // Initialize Ontology Visualization
-  useEffect(() => {
-    const container = document.getElementById("ontologyGraph");
+  // ✅ Fetch AI-Generated Investment Insights (SPARQL + NLG)
+  const fetchInvestmentInsights = async (ticker) => {
+    try {
+      setLoadingInsights(true);
+      const response = await axios.post("http://localhost:5000/investment-insights", { ticker });
 
-    // Sample ontology nodes (Companies, Stock Market, Financial Metrics, Earnings)
-    const nodes = [
-      { id: 1, label: "Apple (AAPL)", group: "company", ticker: "AAPL", company: "Apple" },
-      { id: 2, label: "Tesla (TSLA)", group: "company", ticker: "TSLA", company: "Tesla" },
-      { id: 3, label: "Microsoft (MSFT)", group: "company", ticker: "MSFT", company: "Microsoft" },
-      { id: 4, label: "Stock Market", group: "category" },
-      { id: 5, label: "Earnings Report", group: "finance" },
-      { id: 6, label: "Revenue Growth", group: "finance" },
-      { id: 7, label: "Market Sentiment", group: "finance" },
-    ];
-
-    const edges = [
-      { from: 1, to: 4, label: "Trades in" },
-      { from: 2, to: 4, label: "Trades in" },
-      { from: 3, to: 4, label: "Trades in" },
-      { from: 1, to: 5, label: "Reports earnings" },
-      { from: 2, to: 5, label: "Reports earnings" },
-      { from: 3, to: 5, label: "Reports earnings" },
-      { from: 1, to: 6, label: "Influences" },
-      { from: 2, to: 6, label: "Influences" },
-      { from: 3, to: 6, label: "Influences" },
-      { from: 1, to: 7, label: "Affects sentiment" },
-      { from: 2, to: 7, label: "Affects sentiment" },
-      { from: 3, to: 7, label: "Affects sentiment" },
-    ];
-
-    const data = { nodes, edges };
-    const options = {
-      nodes: { shape: "dot", size: 20 },
-      edges: { arrows: "to", font: { align: "top" } },
-      interaction: { hover: true },
-      physics: { stabilization: true },
-    };
-
-    const network = new Network(container, data, options);
-
-    // Listen for node clicks
-    network.on("click", (event) => {
-      const nodeId = event.nodes[0]; // Get clicked node
-      const node = nodes.find((n) => n.id === nodeId);
-
-      if (node && node.group === "company") {
-        setSelectedCompany(node);
-        fetchStockPrices(node.ticker);
-        fetchFinancialMetrics(node.company);
+      if (response.data.insight) {
+        setInvestmentInsights(response.data.insight);
+      } else {
+        setInvestmentInsights("No insights found.");
       }
-    });
-  }, []);
 
+      setLoadingInsights(false);
+    } catch (error) {
+      console.error("Error fetching investment insights:", error);
+      setLoadingInsights(false);
+    }
+  };
+
+  // ✅ Load and Show Data on Button Click
+  const handleAnalyzeInvestment = async () => {
+    setLoading(true);
+
+    try {
+      const rdfResponse = await axios.get(`http://localhost:5000/rdf-stock-data?ticker=${ticker}&years=${years}`);
+      setRdfData(rdfResponse.data);
+    } catch (error) {
+      console.error("❌ Error fetching RDF data:", error);
+      setRdfData(null);
+    }
+
+    try {
+      const stockResponse = await axios.get(`http://localhost:5000/stock-prices?ticker=${ticker}`);
+      
+      if (stockResponse.data.error) {
+        console.error("⚠️ Stock Price API Error:", stockResponse.data.error);
+        setStockPrices(null);
+      } else {
+        setStockPrices(stockResponse.data);
+      }
+    } catch (error) {
+      console.error("❌ Error fetching stock prices:", error);
+      setStockPrices(null);
+    }
+
+    setLoading(false);
+  };
   return (
     <Container maxWidth="lg">
       <Typography variant="h4" gutterBottom textAlign="center">
-        📊 Ontology Visualization & Stock Trends
+        Ontology Visualization & Stock Trends
       </Typography>
 
+      {/* ✅ Form for Stock Selection */}
       <Paper elevation={3} sx={{ padding: 3, marginBottom: 3, borderRadius: 2 }}>
-        <Typography variant="h6">🔍 Interactive Ontology Graph</Typography>
-        <Box id="ontologyGraph" sx={{ height: "400px", border: "1px solid #ddd", marginTop: 2 }}></Box>
+        <Typography variant="h6">Stock Analysis</Typography>
+        <TextField
+          label="Stock Tickers (comma-separated)"
+          value={ticker}
+          onChange={(e) => setTicker(e.target.value)}
+          fullWidth
+          margin="normal"
+          placeholder="Example: AAPL, TSLA, GOOG"
+        />
+        <TextField
+          label="Start Date"
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          fullWidth
+          margin="normal"
+          InputLabelProps={{ shrink: true }}
+        />
+        <TextField
+          label="End Date"
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          fullWidth
+          margin="normal"
+          InputLabelProps={{ shrink: true }}
+        />
+        <Button variant="contained" color="primary" fullWidth sx={{ marginTop: 2 }} onClick={handleAnalyzeInvestment}>
+          Analyze Investment
+        </Button>
       </Paper>
 
-      {/* Side Panel for Financial Metrics */}
-      {selectedCompany && (
-        <Paper elevation={3} sx={{ padding: 3, marginBottom: 3, borderRadius: 2 }}>
-          <Typography variant="h6">📌 Company Overview: {selectedCompany.label}</Typography>
-          {loadingMetrics ? (
-            <CircularProgress />
-          ) : (
-            <>
-              <Typography variant="body1">Market Cap: ${financialMetrics.market_cap}</Typography>
-              <Typography variant="body1">Revenue: ${financialMetrics.revenue}</Typography>
-              <Typography variant="body1">P/E Ratio: {financialMetrics.pe_ratio}</Typography>
-              <Typography variant="body1">Earnings Growth: {financialMetrics.earnings_growth}%</Typography>
-              <Divider sx={{ marginY: 2 }} />
-              <Typography variant="body2">
-                Market sentiment and financial health impact stock performance.
-              </Typography>
-            </>
-          )}
-        </Paper>
-      )}
+      {/* ✅ Only Show Results After Button Click */}
+      {showResults && (
+        <>
+          {/* ✅ Ontology Graph */}
+          <Paper elevation={3} sx={{ padding: 3, marginBottom: 3, borderRadius: 2 }}>
+            <Typography variant="h6">Interactive Ontology Graph</Typography>
+            <Box id="ontologyGraph" sx={{ height: "500px", border: "1px solid #ddd", marginTop: 2 }}></Box>
+          </Paper>
 
-      {/* Time-Series Stock Price Chart */}
-      {selectedCompany && (
-        <Paper elevation={3} sx={{ padding: 3, marginBottom: 3, borderRadius: 2 }}>
-          <Typography variant="h6">
-            📈 Stock Price Trends for {selectedCompany.label}
-          </Typography>
-          {loadingStock ? (
-            <CircularProgress />
-          ) : (
-            <Plot
-              data={[
-                {
-                  x: stockPrices.map((d) => d.isRecordedOn),
-                  y: stockPrices.map((d) => d.priceValue),
-                  type: "scatter",
-                  mode: "lines",
-                  marker: { color: "#1f77b4" },
-                },
-              ]}
-              layout={{
-                title: `Historical Stock Prices for ${selectedCompany.label}`,
-                xaxis: { title: "Date" },
-                yaxis: { title: "Stock Price (USD)" },
-                height: 400,
-              }}
-              useResizeHandler
-              style={{ width: "100%", height: "100%" }}
-            />
+          {/* ✅ Financial Metrics */}
+          {selectedCompany && (
+            <Paper elevation={3} sx={{ padding: 3, marginBottom: 3, borderRadius: 2 }}>
+              <Typography variant="h6">Company Overview: {selectedCompany}</Typography>
+              {loadingMetrics ? (
+                <CircularProgress />
+              ) : (
+                <>
+                  <Typography variant="body1">Revenue: ${financialMetrics.Revenue || "N/A"}</Typography>
+                  <Typography variant="body1">P/E Ratio: {financialMetrics["P/E Ratio"] || "N/A"}</Typography>
+                </>
+              )}
+            </Paper>
           )}
-        </Paper>
+
+          {loading && <CircularProgress />}
+
+          {rdfData && (
+            <Paper elevation={3} sx={{ padding: 3, marginBottom: 3 }}>
+              <Typography variant="h6">RDF Data</Typography>
+              <pre>{rdfData}</pre>
+            </Paper>
+          )}
+
+          {/* ✅ Stock Prices */}
+          {selectedCompany && (
+            <Paper elevation={3} sx={{ padding: 3, marginBottom: 3, borderRadius: 2 }}>
+              <Typography variant="h6">Stock Price Trends for {selectedCompany}</Typography>
+              {loadingStock ? (
+                <CircularProgress />
+              ) : (
+                <Plot
+                  data={[{
+                    x: stockPrices.dates,
+                    y: stockPrices.prices,
+                    type: "scatter",
+                    mode: "lines",
+                    marker: { color: "blue" }
+                  }]}
+                  layout={{ title: `Stock Prices for ${selectedCompany}`, xaxis: { title: "Date" }, yaxis: { title: "Price (USD)" } }}
+                  useResizeHandler
+                  style={{ width: "100%", height: "400px" }}
+                />
+              )}
+            </Paper>
+          )}
+
+          {/* ✅ AI-Generated Investment Insights */}
+          <Paper elevation={3} sx={{ padding: 3, marginBottom: 3, borderRadius: 2 }}>
+            <Typography variant="h6">Investment Insights</Typography>
+            {loadingInsights ? <CircularProgress /> : <Typography variant="body1">{investmentInsights}</Typography>}
+          </Paper>
+        </>
       )}
     </Container>
   );
