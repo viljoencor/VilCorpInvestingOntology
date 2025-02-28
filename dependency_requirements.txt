@@ -3,6 +3,9 @@ beautifulsoup4
 rdflib
 pandas
 selenium
+flask
+flask_cors
+requests
 npm install react-router-dom
 npm install @mui/icons-material
 npm install axios

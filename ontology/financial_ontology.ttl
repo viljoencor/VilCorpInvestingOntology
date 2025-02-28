@@ -1,0 +1,37 @@
+@prefix ex: <http://example.org/finance#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .  # ✅ FIX: Explicitly define xsd
+
+# Ontology Definition
+ex:FinancialOntology rdf:type owl:Ontology .
+
+# 🔹 Defining Entities
+ex:Company rdf:type owl:Class .
+ex:StockPrice rdf:type owl:Class .
+ex:FinancialMetric rdf:type owl:Class .
+ex:MarketSentiment rdf:type owl:Class .
+ex:EconomicIndicator rdf:type owl:Class .
+ex:InvestorProfile rdf:type owl:Class .
+
+# 🔗 Defining Relationships
+ex:hasFinancialMetric rdf:type owl:ObjectProperty ;
+                      rdfs:domain ex:Company ;
+                      rdfs:range ex:FinancialMetric .
+
+ex:hasStockPrice rdf:type owl:ObjectProperty ;
+                 rdfs:domain ex:Company ;
+                 rdfs:range ex:StockPrice .
+
+ex:influences rdf:type owl:ObjectProperty ;
+              rdfs:domain ex:MarketSentiment ;
+              rdfs:range ex:StockPrice .
+
+ex:affects rdf:type owl:ObjectProperty ;
+           rdfs:domain ex:EconomicIndicator ;
+           rdfs:range ex:CompanyPerformance .
+
+ex:determines rdf:type owl:ObjectProperty ;
+              rdfs:domain ex:InvestorProfile ;
+              rdfs:range ex:InvestmentStrategy .

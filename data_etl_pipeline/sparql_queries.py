@@ -5,17 +5,7 @@ import pandas as pd
 FUSEKI_URL = "http://localhost:3030"
 DATASET_NAME = "vilcorp_data"
 
-# Utility function to execute a SPARQL query
 def execute_sparql_query(query):
-    """
-    Executes a SPARQL query against the Fuseki triplestore.
-    
-    Args:
-        query (str): The SPARQL query string.
-    
-    Returns:
-        dict: The JSON response from Fuseki.
-    """
     headers = {'Content-Type': 'application/sparql-query'}
     response = requests.post(
         f"{FUSEKI_URL}/{DATASET_NAME}/query",
@@ -23,17 +13,14 @@ def execute_sparql_query(query):
         headers=headers
     )
     if response.status_code == 200:
-        return response.json()
+        try:
+            return response.json()
+        except ValueError:
+            raise ValueError("Failed to parse SPARQL response as JSON.")
     else:
-        raise Exception(
-            f"Failed to execute query: {response.status_code}\n{response.text}"
-        )
+        raise Exception(f"SPARQL query failed: {response.status_code}\n{response.text}")
 
-# SPARQL Query Functions
 def financial_metrics_query(company_name):
-    """
-    Retrieves all FinancialMetrics for a specific company.
-    """
     query = f"""
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX vilcorp: <http://www.semanticweb.org/viljo/ontologies/2024/10/untitled-ontology-3/>
@@ -42,35 +29,34 @@ def financial_metrics_query(company_name):
     SELECT ?metricName ?metricValue ?metricUnit
     WHERE {{
         ?company rdf:type vilcorp:Company ;
-                vilcorp:hasName "Capitec Bank" ;
+                vilcorp:hasName "{company_name}" ;
                 vilcorp:hasFinancialMetric ?metric .
         ?metric vilcorp:metricName ?metricName ;
                 vilcorp:metricValue ?metricValue ;
                 vilcorp:metricUnit ?metricUnit .
     }}
-
     """
     return execute_sparql_query(query)
 
 def news_sentiment_query(company_name, min_sentiment=-1.0, max_sentiment=1.0):
-    """
-    Fetches news articles linked to a company with sentiment filtering.
-    """
     query = f"""
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX vilcorp: <http://www.semanticweb.org/viljo/ontologies/2024/10/untitled-ontology-3/>
-    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-    
     SELECT ?headline ?publicationDate ?sentimentScore ?company
-        WHERE {{
-            ?news a vilcorp:NewsArticle ;
-                vilcorp:headline ?headline ;
-                vilcorp:hasSentiment ?sentimentScore ;
-        FILTER (?sentimentScore >= 0.0 || ?sentimentScore <= 1.0)
-        }}
-        ORDER BY DESC(?sentimentScore)
+    WHERE {{
+        ?news a vilcorp:NewsArticle ;
+              vilcorp:headline ?headline ;
+              vilcorp:hasSentiment ?sentimentScore .
+        FILTER (?sentimentScore >= {min_sentiment} && ?sentimentScore <= {max_sentiment})
+    }}
     """
-    return execute_sparql_query(query)
+    result = execute_sparql_query(query)
+    
+    # Validate the output
+    if not isinstance(result, dict):
+        raise ValueError("SPARQL query did not return a valid JSON object.")
+    
+    return result
 
 def stock_price_query(start_date, end_date):
     """
@@ -93,23 +79,47 @@ def stock_price_query(start_date, end_date):
     return execute_sparql_query(query)
 
 def performance_overview_query(company_name):
-    """
-    Fetches the performance overview metrics for a company.
-    """
     query = f"""
-    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX vilcorp: <http://www.semanticweb.org/viljo/ontologies/2024/10/untitled-ontology-3/>
-    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-    
     SELECT ?index ?period ?cpiReturn ?indexReturn
     WHERE {{
-        ?overview a vilcorp:PerformanceOverview ;
-                  vilcorp:company ?company ;
+        ?overview vilcorp:company ?company ;
                   vilcorp:period ?period ;
                   vilcorp:cpiReturn ?cpiReturn ;
                   vilcorp:indexReturn ?indexReturn .
     }}
-    ORDER BY ?period
+    """
+    return execute_sparql_query(query)
+
+def fetch_wikidata_id(company_name):
+    query = f"""
+    SELECT ?entity ?label WHERE {{
+      ?entity rdfs:label "{company_name}"@en .
+      FILTER(CONTAINS(STR(?entity), "wikidata.org/entity"))
+    }}
+    LIMIT 1
+    """
+    url = "https://query.wikidata.org/sparql"
+    headers = {'Accept': 'application/json'}
+    response = requests.get(url, params={'query': query}, headers=headers)
+    
+    if response.status_code == 200:
+        data = response.json()
+        if data['results']['bindings']:
+            return data['results']['bindings'][0]['entity']['value']
+    return None
+
+def linked_data_query(company_name):
+    """
+    Fetches linked data URIs for a company.
+    """
+    query = f"""
+    PREFIX owl: <http://www.w3.org/2002/07/owl#>
+    SELECT ?linkedURI WHERE {{
+        ?company rdf:type vilcorp:Company ;
+                 vilcorp:hasName "{company_name}" ;
+                 owl:sameAs ?linkedURI .
+    }}
     """
     return execute_sparql_query(query)
 
