@@ -5,7 +5,7 @@ from rdflib.namespace import RDF, OWL
 def parse_rdf_file(rdf_file):
     # Load the RDF graph
     graph = Graph()
-    graph.parse(rdf_file, format='xml')
+    graph.parse(rdf_file, format='turtle')
 
     nodes = []
     edges = []

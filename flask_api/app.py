@@ -16,17 +16,18 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import json
 from rdflib import Graph, Namespace
+from textblob import TextBlob
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 
 # Add the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from data_etl_pipeline.graph_funcations import parse_rdf_file
 from data_etl_pipeline.sparql_queries import (
     financial_metrics_query
 )
 from data_etl_pipeline.data_extraction import StockPriceExtractor, NewsAPIExtractor, YahooFinanceExtractor
-from data_etl_pipeline.data_cleaning import clean_news_articles
 from data_etl_pipeline.generate_rdf import generate_rdf_for_stock 
 
 app = Flask(__name__)
@@ -90,6 +91,18 @@ def get_dynamic_stock_prices():
     except Exception as e:
         print("ERROR:", e)  # 🚀 Debug Print
         return jsonify({'error': str(e)}), 500
+
+def clean_news_articles(news_data, company_name):
+    if not isinstance(news_data, list):
+        raise ValueError("Expected a list of news articles.")
+
+    unique_articles = {article['title']: article for article in news_data if isinstance(article, dict)}
+    for article in unique_articles.values():
+        article['title'] = article.get('title', '').strip()
+        article['mentionsCompany'] = company_name if company_name.lower() in article['title'].lower() else None
+        article['sentimentScore'] = TextBlob(article['title']).sentiment.polarity
+
+    return list(unique_articles.values())
 
 @app.route('/run-pipeline', methods=['POST'])
 def run_pipeline():
@@ -471,9 +484,25 @@ FUSEKI_ENDPOINT = "http://localhost:3030/financial-data"
 rdf_graph = Graph()
 rdf_graph.parse("ontology/financial_ontology.ttl", format="turtle")
 
+@app.route('/rdf-graph-data', methods=['GET'])
+def get_rdf_graph_data():
+    try:
+        ticker = request.args.get("ticker")
+        if not ticker:
+            return jsonify({"error": "Missing ticker parameter"}), 400
 
+        # You can optionally support a 'years' parameter. Here default is "5y"
+        years = request.args.get("years", "5y")
+        rdf_file = os.path.join(RDF_STORAGE_DIR, f"{ticker}_{years}.ttl")
+        
+        if not os.path.exists(rdf_file):
+            return jsonify({"error": f"RDF file for {ticker} not found at {rdf_file}"}), 404
+        
+        graph_data = parse_rdf_file(rdf_file)
+        return jsonify(graph_data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-# 2. Storing RDF in Fuseki
 def store_rdf_in_fuseki(graph):
     """Uploads RDF data to Apache Fuseki."""
     headers = {"Content-Type": "text/turtle"}
@@ -493,8 +522,6 @@ def store_rdf():
     return jsonify({"status": "success" if success else "failed"})
 
 
-# 🔹 3. Running SPARQL Queries on RDF Data
-# -----------------------------------------------
 def run_sparql_query(query):
     """Executes a SPARQL query against the RDF knowledge graph."""
     try:
@@ -559,9 +586,6 @@ def parse_rdf_to_json(rdf_graph):
     json_data["nodes"] = list(node_labels.values())
     return json_data
 
-# -----------------------------------------------
-# 🔹 4. Fetch Financial Ontology as JSON
-# -----------------------------------------------
 @app.route('/financial-ontology', methods=['GET'])
 def get_financial_ontology():
     
@@ -612,8 +636,6 @@ def load_rdf_graph():
         print(f"🚨 ERROR: {e}")
         return None
 rdf_graph = load_rdf_graph()
-
-
 
 
 
