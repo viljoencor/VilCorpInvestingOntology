@@ -3,19 +3,18 @@ import { Route, Routes, Link, useLocation } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Tabs, Tab, Container, Box, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
 import ComparativeAnalysis from './components/ComparativeAnalysis';
-import LinkedOpenData from './components/LinkedOpenData';
 import AnalysisPrediction from './components/AnalysisPrediction';
 import MonteCarloSimulation from "./components/MonteCarloSimulation";
-import FinancialOntologyGraph from './components/FinancialOntologyGraph';
-
+import FinnhubTabs from './components/FinnhubTabs';
+import Learn from './components/Learn';
 
 // ✅ Define Routes Properly
 const routes = [
   { path: "/", label: "Investment Analysis", component: <ComparativeAnalysis /> },
+  { path: "/finnhub-data", label: "Linked Open Data Visualization", component: <FinnhubTabs /> },
   { path: "/predict", label: "Analysis Prediction", component: <AnalysisPrediction /> },
   { path: "/montecarlo", label: "Monte Carlo Simulation", component: <MonteCarloSimulation /> },
-  { path: "/ontology", label: "Financial Ontology Graph", component: <FinancialOntologyGraph /> },
-  { path: "/linkdataviz", label: "Linked Open Data Visualization", component: <LinkedOpenData /> }
+  { path: "/lear", label: "Learning", component: <Learn /> }
 ];
 
 

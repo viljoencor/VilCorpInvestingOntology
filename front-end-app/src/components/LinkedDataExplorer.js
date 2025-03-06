@@ -240,18 +240,6 @@ const LinkedDataExplorer = ({ results, financialStatistics }) => {
     if (containerRef.current) {
       networkRef.current = new Network(containerRef.current, data, options);
 
-      // Node click event to show details (alert for simplicity)
-      networkRef.current.on("click", (params) => {
-        if (params.nodes.length) {
-          const nodeId = params.nodes[0];
-          const nodeData = data.nodes.get(nodeId);
-          alert(
-            `Node Details:\nLabel: ${nodeData.label}\nGroup: ${nodeData.group}\nTitle: ${
-              nodeData.title || "No details"
-            }`
-          );
-        }
-      });
 
       // Hover event logging
       networkRef.current.on("hoverNode", (params) => {
