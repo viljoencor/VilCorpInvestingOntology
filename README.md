@@ -67,42 +67,41 @@ By integrating data from various sources, such as financial reports, news articl
 ```plaintext
 VILCORPINVESTINGONTOLOGY/
 ├── data_etl_pipeline/
-│   ├── data_extraction.py
-│   ├── data_transformation.py
-│   ├── generate_rdf.py
-│   ├── graph_functions.py
-│   └── sparql_queries.py
+│   ├── data_extraction.py          # Extraction of stock prices, news articles, and financial metrics
+│   ├── data_transformation.py      # Conversion of raw data into RDF graphs; enhancement with external links
+│   ├── generate_rdf.py             # Generates RDF representations using yfinance and rdflib
+│   ├── graph_functions.py          # Utilities for parsing RDF into nodes/edges for visualization
+│   └── sparql_queries.py           # SPARQL queries for retrieving financial metrics, news sentiment, etc.
 ├── flask_api/
-│   ├── app.py
-│   └── finnhub_api.py
-├── front_end_app/
+│   ├── app.py                      # Flask API backend serving multiple endpoints (e.g., predictions, RDF operations)
+│   └── finnhub_api.py              # Endpoints to fetch and enrich Finnhub data, including news and SEC filings
+├── front_end_app/                  # (Static assets if needed)
 ├── src/
 │   ├── components/
-│   │   ├── AnalysisPrediction.js
-│   │   ├── ComparativeAnalysis.js
-│   │   ├── FinhubTabs.js
-│   │   ├── InvestmentSummary.js
-│   │   ├── Learn.js
-│   │   ├── LinkedDataExplorer.js
-│   │   ├── LinkedFinhubExplorer.js
-│   │   ├── LoadingSpinner.js
-│   │   ├── MonteCarloSimulation.js
-│   │   ├── PipelineInputForm.js
-│   │   └── StockPriceChart.js
+│   │   ├── AnalysisPrediction.js     # Interactive prediction tool with Plotly charts
+│   │   ├── ComparativeAnalysis.js    # Multi-tab investment analysis & pipeline input (also exported as PipelineInputForm)
+│   │   ├── FinhubTabs.js             # Tabbed interface to explore Finnhub data via LinkedFinnhubExplorer
+│   │   ├── InvestmentSummary.js      # Displays concise investment summaries with key metrics
+│   │   ├── Learn.js                  # Educational module (placeholder)
+│   │   ├── LinkedDataExplorer.js     # Interactive RDF graph visualization using vis-network
+│   │   ├── LinkedFinhubExplorer.js   # Graph visualization focused on Finnhub data
+│   │   ├── LoadingSpinner.js         # Reusable component for indicating loading states
+│   │   ├── MonteCarloSimulation.js   # Runs Monte Carlo simulations; displays simulation results with Plotly
+│   │   ├── PipelineInputForm.js      # Alternative pipeline interface for comprehensive investment analysis
+│   │   └── StockPriceChart.js        # Renders dynamic stock price line charts using Recharts
 │   ├── App.css
-│   ├── App.js
+│   ├── App.js                        # Main application component with routing and navigation
 │   └── index.js
 ├── package-lock.json
 ├── package.json
 ├── ontology/
-│   └── financial_ontology.ttl
+│   └── financial_ontology.ttl        # RDF/Turtle file defining the financial ontology (Company, FinancialMetric, NewsArticle, StockPrice)
 ├── rdf_data/
-│   └── GOOG_5y.ttl
+│   └── GOOG_5y.ttl                   # Example RDF file for 5-year stock data
 ├── testing/
-│   ├── graph_validation.py
-│   └── sparql_testing.py
-└── dependency_requirements.txt
-
+│   ├── graph_validation.py           # Tests for RDF graph parsing and visualization correctness
+│   └── sparql_testing.py             # Tests for SPARQL query accuracy and performance
+└── dependency_requirements.txt       # List of project dependencies
 ```
 
 ## Code Files Description
