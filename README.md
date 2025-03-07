@@ -66,54 +66,106 @@ By integrating data from various sources, such as financial reports, news articl
 ## **Project Structure**
 ```plaintext
 VILCORPINVESTINGONTOLOGY/
-├── data_etl_pipeline/              		# ETL pipeline for data processing
-│   ├── __pycache__/                		# Compiled Python files
-│   ├── data_cleaning.py            		# Script for cleaning raw data
-│   ├── data_extraction.py          		# Script for extracting data from sources
-│   ├── data_loading.py             		# Script for loading data into a triplestore
-│   ├── data_scraping.py            		# Script for scraping external data sources
-│   ├── data_transformation.py      		# Script for transforming data into RDF triples
-│   ├── graph_functions.py          		# Helper functions for managing RDF graphs
-│   ├── sentiment_analysis.py       		# Script for sentiment analysis on news articles
-│   ├── sparql_queries.py           		# SPARQL query definitions
-│		
-├── flask_api/                      		# Flask API backend
-│   ├── app.py                      		# Flask app entry point
-│		
-├── front-end-app/                  		# Frontend application
-│   ├── node_modules/               		# Node.js modules for React app
-│   ├── public/                     		# Public assets for React app
-│   ├── src/                        		# React source files
-│   │   ├── components/             		# UI components for the frontend
-│   │   │   ├── ComparativeAnalysis.js 		# Component for comparative analysis
-│   │   │   ├── Dashboard.js        		# Main dashboard component
-│   │   │   ├── FinancialData.js    		# Component for financial data insights
-│   │   │   ├── FinancialMetrics.js 		# Component for financial metrics
-│   │   │   ├── LinkedDataVisualization.js 	# Component for linked data visualization
-│   │   │   ├── NewsInsights.js     		# Component for news insights and sentiment
-│   │   │   ├── PerformanceOverview.js 		# Component for performance metrics overview
-│   │   ├── mockData/               		# Mock data for testing UI components
-│   │   ├── services/               		# Service files for API calls
-│   │   ├── App.js                  		# Root React component
-│   │   ├── App.css                 		# Styling for React app
-│   │   ├── App.test.js             		# Unit tests for App component
-│   │   ├── index.js                		# React entry point
-│   │   ├── index.css               		# Global CSS
-│   │   ├── logo.svg                		# Logo asset
-│   │   ├── reportWebVitals.js      		# Performance reporting
-│   │   ├── setupTests.js           		# Test setup
-│   ├── package-lock.json           		# Lockfile for npm dependencies
-│   ├── package.json                		# Frontend npm dependencies
-│
-├── node_modules/                   		# Node.js modules for backend
-├── dependency_requirements.txt     		# Python requirements for backend
-├── main.py                         		# Main entry point for combined pipeline
-├── package-lock.json               		# Lockfile for backend npm dependencies
-├── package.json                    		# Backend npm dependencies
-├── VilCorpInvestingOntology_data.rdf 		# RDF data export
-├── VilCorpInvestingOntology.ttl    		# Turtle data for ontology
+├── data_etl_pipeline/
+│   ├── data_extraction.py
+│   ├── data_transformation.py
+│   ├── generate_rdf.py
+│   ├── graph_functions.py
+│   └── sparql_queries.py
+├── flask_api/
+│   ├── app.py
+│   └── finnhub_api.py
+├── front_end_app/
+├── src/
+│   ├── components/
+│   │   ├── AnalysisPrediction.js
+│   │   ├── ComparativeAnalysis.js
+│   │   ├── FinhubTabs.js
+│   │   ├── InvestmentSummary.js
+│   │   ├── Learn.js
+│   │   ├── LinkedDataExplorer.js
+│   │   ├── LinkedFinhubExplorer.js
+│   │   ├── LoadingSpinner.js
+│   │   ├── MonteCarloSimulation.js
+│   │   ├── PipelineInputForm.js
+│   │   └── StockPriceChart.js
+│   ├── App.css
+│   ├── App.js
+│   └── index.js
+├── package-lock.json
+├── package.json
+├── ontology/
+│   └── financial_ontology.ttl
+├── rdf_data/
+│   └── GOOG_5y.ttl
+├── testing/
+│   ├── graph_validation.py
+│   └── sparql_testing.py
+└── dependency_requirements.txt
 
 ```
+
+## Code Files Description
+#### data_etl_pipeline/data_extraction.py: 
+  Contains classes for extracting stock prices (using yfinance), news articles (via NewsApiClient), and financial metrics (via YahooFinanceExtractor). 
+
+#### data_etl_pipeline/data_transformation.py: 
+  Implements functions to create RDF graphs from stock, news, and financial data using rdflib, and includes support for external link enhancement. 
+
+#### data_etl_pipeline/generate_rdf.py: 
+  Generates an RDF representation of a stock's data (including financial metrics and historical stock prices) using yfinance and rdflib. 
+
+#### data_etl_pipeline/graph_functions.py: 
+  Provides utilities for parsing RDF files into nodes and edges for visualization, as well as a helper to add external links (e.g., linking to Wikidata). 
+
+#### data_etl_pipeline/sparql_queries.py: 
+ Contains functions to execute SPARQL queries against a Fuseki endpoint and helper queries for fetching financial metrics, news sentiment, stock prices, performance 
+ overview, and linked data. It also includes an example usage section. 
+
+#### flask_api/app.py: 
+ Implements a Flask API backend with multiple endpoints to serve financial metrics, stock prices (both static and dynamic), predictions (linear, polynomial, and Monte Carlo simulation), investment insights, and RDF operations. It integrates data extraction, RDF generation, and visualization using Plotly. 
+
+#### flask_api/finnhub_api.py: 
+ Provides endpoints to fetch Finnhub data, including company profile, financials, SEC filings, insider transactions/institutional holdings, and company news, with optional 
+ Wikidata enrichment. 
+
+============================================================================================
+
+#### AnalysisPrediction.js
+   Provides an educational and interactive interface for stock price prediction. Users can input a stock ticker, choose a forecast period and a prediction method (linear or polynomial regression), then view an interactive Plotly chart displaying the predicted stock prices.
+
+#### ComparativeAnalysis.js
+   (Also exported as PipelineInputForm in this file) Presents a form where users can enter comma-separated tickers and select a news date range. It then calls the backend pipeline to fetch investment data. The interface displays results through multiple tabs covering investment summaries, stock prices, news insights, performance overview, financial statistics, and a linked data visualization.
+
+#### FinhubTabs.js
+   Implements a tabbed interface that retrieves Finnhub data via an API call (using axios) and displays various aspects of the company's information (profile, financials, SEC filings, insider transactions, news, and Wikidata enrichment) through the reusable component LinkedFinnhubExplorer.
+
+#### InvestmentSummary.js
+   Displays a concise investment summary for a given stock, including performance metrics, financial ratios, cash/debt data, and sentiment analysis. It also highlights potential investment warnings or opportunities based on these metrics.
+
+#### Learn.js
+   (Placeholder) Intended for educational content or tutorials. Its content wasn’t provided, but it’s part of the overall learning module.
+
+#### LinkedDataExplorer.js
+   Uses the vis-network library to render an interactive graph visualization of investment data. It builds nodes and edges based on performance, financial metrics, financial statistics, and news insights, and offers filtering options (by company and group) along with physics toggling for dynamic layout adjustments.
+
+#### LinkedFinnhubExplorer.js
+   Similar to LinkedDataExplorer but focused on Finnhub data. Depending on the selected mode (profile, financials, SEC filings, insider, news, or Wikidata), it builds and displays a graph that illustrates the relationships within the retrieved Finnhub dataset.
+
+#### LoadingSpinner.js
+   A simple, reusable component that shows a CircularProgress indicator and a customizable loading message.
+
+#### MonteCarloSimulation.js
+   Allows users to run a Monte Carlo simulation for a stock’s future prices. Users input a ticker and the number of years to predict; the component then fetches simulation data from the backend and displays key simulation results (current price, expected price, price range) along with an interactive Plotly chart of multiple simulated price trajectories.
+
+#### PipelineInputForm.js
+   Provides another interface for running the investment analysis pipeline. It collects inputs (company name, ticker, start and end dates), fetches pipeline results and financial statistics, and displays them under several tabs (investment summary, stock prices, news insights, performance overview, financial metrics, and financial statistics). It also includes an option to toggle raw JSON display.
+
+#### StockPriceChart.js
+   Fetches dynamic stock price data for selected tickers over various time ranges (e.g., 6 months, 1 year, etc.) and renders a combined line chart using Recharts. It merges price data by date and allows the user to select the time range for display.
+
+#### App.js
+   The main application component that defines the navigation and routing for the front-end. It sets up an AppBar with tabs (using react-router-dom and MUI), and routes to the different sections: Investment Analysis (ComparativeAnalysis/PipelineInputForm), Linked Open Data Visualization (FinhubTabs), Analysis Prediction (AnalysisPrediction), Monte Carlo Simulation (MonteCarloSimulation), and Learning (Learn). It also includes a footer and uses framer-motion for animated transitions.
 
 ## Installation and Setup
 
