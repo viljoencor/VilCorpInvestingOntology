@@ -80,7 +80,7 @@ const InvestmentSummary = ({ ticker, results, financialStatistics }) => {
           </Typography>
         ) : (
           <Typography variant="body1" sx={{ marginTop: 2, fontWeight: "bold", color: "green" }}>
-            ✅ Investment Potential: {ticker} appears to be a solid long-term investment with strong profitability, financial stability, reasonable valuation and positive news sentiment.
+             Investment Potential: {ticker} appears to be a solid long-term investment with strong profitability, financial stability, reasonable valuation and positive news sentiment.
           </Typography>
         )}
       </CardContent>

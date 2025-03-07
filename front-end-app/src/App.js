@@ -8,7 +8,7 @@ import MonteCarloSimulation from "./components/MonteCarloSimulation";
 import FinnhubTabs from './components/FinnhubTabs';
 import Learn from './components/Learn';
 
-// ✅ Define Routes Properly
+//  Define Routes Properly
 const routes = [
   { path: "/", label: "Investment Analysis", component: <ComparativeAnalysis /> },
   { path: "/finnhub-data", label: "Linked Open Data Visualization", component: <FinnhubTabs /> },
@@ -18,7 +18,7 @@ const routes = [
 ];
 
 
-// ✅ Navigation Bar Component
+//  Navigation Bar Component
 const Navigation = () => {
   const location = useLocation();
   const currentTab = routes.findIndex(route => route.path === location.pathname);
@@ -45,7 +45,7 @@ const Navigation = () => {
   );
 };
 
-// ✅ Main App Component (No <Router> here)
+//  Main App Component (No <Router> here)
 const App = () => {
   return (
     <>
@@ -73,7 +73,7 @@ const App = () => {
       </Box>
     </Container>
 
-      {/* ✅ Footer */}
+      {/*  Footer */}
       <Paper elevation={0} sx={{ textAlign: "center", padding: "20px", marginTop: "40px", background: "#1e1e1e" }}>
         <Typography variant="body2" color="#ffcc00">
           © {new Date().getFullYear()} VilCorp Investing. All Rights Reserved.
