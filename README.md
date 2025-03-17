@@ -9,7 +9,7 @@ The primary goal of this project is to create a platform that combines **Linked 
 - Explore market-influencing news with sentiment analysis.
 - Cross-reference data to uncover deeper insights.
 
-By integrating data from various sources, such as financial reports, news articles, and stock market data, the tool offers a comprehensive understanding of a company's position in the market.
+By integrating data from various sources, such as financial reports, news articles, and stock market data, the platform offers a comprehensive understanding of a company's position in the market.
 
 ![Investment_Analysis](https://github.com/user-attachments/assets/00b86df2-50d1-4d51-be6c-0e69dd8c556e)
 
@@ -256,17 +256,13 @@ Contributions are welcome! To contribute:
 - Add advanced visualizations like heatmaps and time sliders.
 - Enable user-defined queries for custom insights.
 
-<iframe width="768" height="432" src="https://miro.com/app/live-embed/uXjVLvgMITI=/?moveToViewport=2102,1432,3592,1326&embedId=149403013758" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
-
 ## License
 This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
 If you have any questions or feedback, feel free to reach out:
-- Email: your-email@example.com
-- LinkedIn: [Your LinkedIn Profile](#)
+- Email: viljoencor@yahoo.com
+- LinkedIn: https://www.linkedin.com/in/cor-viljoen-978a6a116/
 
 ## Acknowledgments
-Special thanks to the contributors, mentors, and open-source libraries that made this project possible.
-
-
+Special thanks to University of London and open-source libraries that made this project possible.
