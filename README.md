@@ -11,6 +11,8 @@ The primary goal of this project is to create a platform that combines **Linked 
 
 By integrating data from various sources, such as financial reports, news articles, and stock market data, the tool offers a comprehensive understanding of a company's position in the market.
 
+![Investment_Analysis](https://github.com/user-attachments/assets/00b86df2-50d1-4d51-be6c-0e69dd8c556e)
+
 ---
 
 ## **Features**
@@ -46,6 +48,9 @@ By integrating data from various sources, such as financial reports, news articl
 
 ---
 
+![Linked_Open_Data_Visualization](https://github.com/user-attachments/assets/df5ff75e-77c6-47d7-b52a-b5eb09734817)
+
+
 ## **Technologies Used**
 ### **Frontend**
 - **React**: Framework for building the UI.
@@ -62,6 +67,9 @@ By integrating data from various sources, such as financial reports, news articl
 - **FuzzyWuzzy**: For aligning entity names across datasets.
 
 ---
+
+![Predictions](https://github.com/user-attachments/assets/f756680e-0bee-4d4b-a7c8-515ae2f60a8a)
+
 
 ## **Project Structure**
 ```plaintext
