@@ -113,65 +113,68 @@ VILCORPINVESTINGONTOLOGY/
 ```
 
 ## Code Files Description
-#### data_etl_pipeline/data_extraction.py: 
+### **Data Pipeline**
+- **data_etl_pipeline/data_extraction.py:** 
   Contains classes for extracting stock prices (using yfinance), news articles (via NewsApiClient), and financial metrics (via YahooFinanceExtractor). 
 
-#### data_etl_pipeline/data_transformation.py: 
+- **data_etl_pipeline/data_transformation.py:**
   Implements functions to create RDF graphs from stock, news, and financial data using rdflib, and includes support for external link enhancement. 
 
-#### data_etl_pipeline/generate_rdf.py: 
+- **data_etl_pipeline/generate_rdf.py:** 
   Generates an RDF representation of a stock's data (including financial metrics and historical stock prices) using yfinance and rdflib. 
 
-#### data_etl_pipeline/graph_functions.py: 
+- **data_etl_pipeline/graph_functions.py:** 
   Provides utilities for parsing RDF files into nodes and edges for visualization, as well as a helper to add external links (e.g., linking to Wikidata). 
 
-#### data_etl_pipeline/sparql_queries.py: 
+- **data_etl_pipeline/sparql_queries.py:** 
  Contains functions to execute SPARQL queries against a Fuseki endpoint and helper queries for fetching financial metrics, news sentiment, stock prices, performance 
  overview, and linked data. It also includes an example usage section. 
 
-#### flask_api/app.py: 
+
+### **Backend API**
+- **flask_api/app.py:** 
  Implements a Flask API backend with multiple endpoints to serve financial metrics, stock prices (both static and dynamic), predictions (linear, polynomial, and Monte Carlo simulation), investment insights, and RDF operations. It integrates data extraction, RDF generation, and visualization using Plotly. 
 
-#### flask_api/finnhub_api.py: 
+- **flask_api/finnhub_api.py:** 
  Provides endpoints to fetch Finnhub data, including company profile, financials, SEC filings, insider transactions/institutional holdings, and company news, with optional 
  Wikidata enrichment. 
 
-============================================================================================
 
-#### AnalysisPrediction.js
+### **Frontend**
+- **AnalysisPrediction.js**
    Provides an educational and interactive interface for stock price prediction. Users can input a stock ticker, choose a forecast period and a prediction method (linear or polynomial regression), then view an interactive Plotly chart displaying the predicted stock prices.
 
-#### ComparativeAnalysis.js
+- **ComparativeAnalysis.js**
    (Also exported as PipelineInputForm in this file) Presents a form where users can enter comma-separated tickers and select a news date range. It then calls the backend pipeline to fetch investment data. The interface displays results through multiple tabs covering investment summaries, stock prices, news insights, performance overview, financial statistics, and a linked data visualization.
 
-#### FinhubTabs.js
+- **FinhubTabs.js**
    Implements a tabbed interface that retrieves Finnhub data via an API call (using axios) and displays various aspects of the company's information (profile, financials, SEC filings, insider transactions, news, and Wikidata enrichment) through the reusable component LinkedFinnhubExplorer.
 
-#### InvestmentSummary.js
+- **InvestmentSummary.js**
    Displays a concise investment summary for a given stock, including performance metrics, financial ratios, cash/debt data, and sentiment analysis. It also highlights potential investment warnings or opportunities based on these metrics.
 
-#### Learn.js
+- **Learn.js**
    (Placeholder) Intended for educational content or tutorials. Its content wasn’t provided, but it’s part of the overall learning module.
 
-#### LinkedDataExplorer.js
+- **LinkedDataExplorer.js**
    Uses the vis-network library to render an interactive graph visualization of investment data. It builds nodes and edges based on performance, financial metrics, financial statistics, and news insights, and offers filtering options (by company and group) along with physics toggling for dynamic layout adjustments.
 
-#### LinkedFinnhubExplorer.js
+- **LinkedFinnhubExplorer.js**
    Similar to LinkedDataExplorer but focused on Finnhub data. Depending on the selected mode (profile, financials, SEC filings, insider, news, or Wikidata), it builds and displays a graph that illustrates the relationships within the retrieved Finnhub dataset.
 
-#### LoadingSpinner.js
+- **LoadingSpinner.js**
    A simple, reusable component that shows a CircularProgress indicator and a customizable loading message.
 
-#### MonteCarloSimulation.js
+- **MonteCarloSimulation.js**
    Allows users to run a Monte Carlo simulation for a stock’s future prices. Users input a ticker and the number of years to predict; the component then fetches simulation data from the backend and displays key simulation results (current price, expected price, price range) along with an interactive Plotly chart of multiple simulated price trajectories.
 
-#### PipelineInputForm.js
+- **PipelineInputForm.js**
    Provides another interface for running the investment analysis pipeline. It collects inputs (company name, ticker, start and end dates), fetches pipeline results and financial statistics, and displays them under several tabs (investment summary, stock prices, news insights, performance overview, financial metrics, and financial statistics). It also includes an option to toggle raw JSON display.
 
-#### StockPriceChart.js
+- **StockPriceChart.js**
    Fetches dynamic stock price data for selected tickers over various time ranges (e.g., 6 months, 1 year, etc.) and renders a combined line chart using Recharts. It merges price data by date and allows the user to select the time range for display.
 
-#### App.js
+- **App.js**
    The main application component that defines the navigation and routing for the front-end. It sets up an AppBar with tabs (using react-router-dom and MUI), and routes to the different sections: Investment Analysis (ComparativeAnalysis/PipelineInputForm), Linked Open Data Visualization (FinhubTabs), Analysis Prediction (AnalysisPrediction), Monte Carlo Simulation (MonteCarloSimulation), and Learning (Learn). It also includes a footer and uses framer-motion for animated transitions.
 
 ## Installation and Setup
