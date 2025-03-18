@@ -3,23 +3,22 @@ import { Route, Routes, Link, useLocation } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Tabs, Tab, Container, Box, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
 import ComparativeAnalysis from './components/ComparativeAnalysis';
-import LinkedDataVisualization from './components/LinkedDataVisualization';
 import AnalysisPrediction from './components/AnalysisPrediction';
 import MonteCarloSimulation from "./components/MonteCarloSimulation";
-import FinancialOntologyGraph from './components/FinancialOntologyGraph'; // Import Ontology Graph
+import FinnhubTabs from './components/FinnhubTabs';
+import Learn from './components/Learn';
 
-
-// ✅ Define Routes Properly
+//  Define Routes Properly
 const routes = [
   { path: "/", label: "Investment Analysis", component: <ComparativeAnalysis /> },
+  { path: "/finnhub-data", label: "Linked Open Data Visualization", component: <FinnhubTabs /> },
   { path: "/predict", label: "Analysis Prediction", component: <AnalysisPrediction /> },
   { path: "/montecarlo", label: "Monte Carlo Simulation", component: <MonteCarloSimulation /> },
-  { path: "/ontology", label: "Financial Ontology Graph", component: <FinancialOntologyGraph /> },
-  { path: "/linkdataviz", label: "Linked Data Visualization", component: <LinkedDataVisualization /> }
+  { path: "/lear", label: "Learning", component: <Learn /> }
 ];
 
 
-// ✅ Navigation Bar Component
+//  Navigation Bar Component
 const Navigation = () => {
   const location = useLocation();
   const currentTab = routes.findIndex(route => route.path === location.pathname);
@@ -46,7 +45,7 @@ const Navigation = () => {
   );
 };
 
-// ✅ Main App Component (No <Router> here)
+//  Main App Component (No <Router> here)
 const App = () => {
   return (
     <>
@@ -74,7 +73,7 @@ const App = () => {
       </Box>
     </Container>
 
-      {/* ✅ Footer */}
+      {/*  Footer */}
       <Paper elevation={0} sx={{ textAlign: "center", padding: "20px", marginTop: "40px", background: "#1e1e1e" }}>
         <Typography variant="body2" color="#ffcc00">
           © {new Date().getFullYear()} VilCorp Investing. All Rights Reserved.

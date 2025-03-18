@@ -23,17 +23,18 @@ const InvestmentSummary = ({ ticker, results, financialStatistics }) => {
 
   const formattedSentiment = typeof avgSentiment === "number" ? avgSentiment.toFixed(2) : "N/A";
 
-  // Industry-average P/E ratio for comparison (estimated, should be dynamic if possible)
+  // Industry-average P/E ratio for comparison (assumed to be 20)
   const industryPeAverage = 20;
-  const isOvervalued = peRatio !== "N/A" && peRatio > industryPeAverage * 2; // If P/E is 2x higher than industry, it's overvalued
+  // Overvaluation condition: P/E > (industryPeAverage * 2) i.e., P/E > 40
+  const isOvervalued = peRatio !== "N/A" && peRatio > industryPeAverage * 2;
 
-  // Strong profitability indicators
+  // Strong profitability indicator: Profit Margin must be at least 15%
   const isProfitable = profitMargin >= 15;
 
-  // Financial stability check
+  // Financial stability: Debt/Equity ratio must be less than 50 (if available)
   const isFinanciallyStable = debtEquity !== "N/A" && debtEquity < 50;
 
-  // Sentiment Check
+  // Market Sentiment: Negative sentiment if the formatted sentiment score is below 50
   const isNegativeSentiment = formattedSentiment !== "N/A" && formattedSentiment < 50;
 
   return (
@@ -56,7 +57,7 @@ const InvestmentSummary = ({ ticker, results, financialStatistics }) => {
           💰 Financial Overview:
         </Typography>
         <Typography>- Profit Margin: <strong>{profitMargin.toFixed(2)}%</strong></Typography>
-        <Typography>- P/E Ratio: <strong>{peRatio}</strong> (Industry Avg: {industryPeAverage} If x 2 it's overvalued)</Typography>
+        <Typography>- P/E Ratio: <strong>{peRatio}</strong> (Industry Avg: {industryPeAverage}; overvalued if greater than {industryPeAverage * 2})</Typography>
         <Typography>- Cash Reserves: <strong>{cash}</strong></Typography>
         <Typography>- Debt/Equity Ratio: <strong>{debtEquity}</strong></Typography>
 
@@ -72,15 +73,12 @@ const InvestmentSummary = ({ ticker, results, financialStatistics }) => {
         {/* Investment Decision - Warning or Potential */}
         {isOvervalued || !isProfitable || !isFinanciallyStable || isNegativeSentiment ? (
           <Typography variant="body1" sx={{ marginTop: 2, fontWeight: "bold", color: "red" }}>
-            🚨 Investment Warning: While {ticker} has some positive attributes, it currently faces risks such as{" "}
-            {isOvervalued ? "a high valuation" : ""}
-            {!isProfitable ? ", weak profitability" : ""}
-            {!isFinanciallyStable ? ", financial instability" : ""}
-            {isNegativeSentiment ? " negative news sentiment" : ""}.
+            🚨 Investment Warning: While {ticker} exhibits some positive attributes, it currently faces risks such as{" "}
+            {isOvervalued ? "a high valuation" : ""}{!isProfitable ? ", weak profitability" : ""}{!isFinanciallyStable ? ", financial instability" : ""}{isNegativeSentiment ? " negative news sentiment" : ""}.
           </Typography>
         ) : (
           <Typography variant="body1" sx={{ marginTop: 2, fontWeight: "bold", color: "green" }}>
-            ✅ Investment Potential: {ticker} appears to be a solid long-term investment with strong profitability, financial stability, reasonable valuation and positive news sentiment.
+            Investment Potential: {ticker} appears to be a solid long-term investment with strong profitability, financial stability, reasonable valuation, and positive news sentiment.
           </Typography>
         )}
       </CardContent>

@@ -22,7 +22,7 @@ const AnalysisPrediction = () => {
 
   return (
     <Container maxWidth="lg">
-      {/* ✅ Educational Section */}
+      {/*  Educational Section */}
       <Paper elevation={3} sx={{ padding: 3, marginBottom: 3, borderRadius: 2 }}>
         <Typography variant="h4" gutterBottom textAlign="center">
           📈 Stock Price Prediction
@@ -35,9 +35,9 @@ const AnalysisPrediction = () => {
           Linear Regression is a simple model that assumes stock prices follow a straight-line trend over time.
           It predicts future prices based on past trends.
         </Typography>
-        <Typography variant="body2">✅ Best for: Stocks with steady trends.</Typography>
-        <Typography variant="body2">✅ How it works: Finds a line that best fits past stock prices.</Typography>
-        <Typography variant="body2">✅ Limitation: Not accurate if stock prices have ups and downs.</Typography>
+        <Typography variant="body2"> Best for: Stocks with steady trends.</Typography>
+        <Typography variant="body2"> How it works: Finds a line that best fits past stock prices.</Typography>
+        <Typography variant="body2"> Limitation: Not accurate if stock prices have ups and downs.</Typography>
 
         <Typography variant="h6" gutterBottom sx={{ marginTop: 2 }}>
           🔹 What is Polynomial Regression?
@@ -47,12 +47,12 @@ const AnalysisPrediction = () => {
           It is useful for stocks that rise and fall unpredictably.
         </Typography>
 
-        <Typography variant="body2">✅ Best for: Stocks with ups and downs or non-linear trends.</Typography>
-        <Typography variant="body2">✅ How it works: Uses a curved equation to fit stock price movements.</Typography>
-        <Typography variant="body2">✅ Limitation: Can sometimes overfit the data and predict patterns that aren't real.</Typography>
+        <Typography variant="body2"> Best for: Stocks with ups and downs or non-linear trends.</Typography>
+        <Typography variant="body2"> How it works: Uses a curved equation to fit stock price movements.</Typography>
+        <Typography variant="body2"> Limitation: Can sometimes overfit the data and predict patterns that aren't real.</Typography>
       </Paper>
 
-      {/* 📌 User Input Section */}
+      {/* User Input Section */}
       <Paper elevation={3} sx={{ padding: 3, borderRadius: 2 }}>
         <Typography variant="h5" gutterBottom>
           🔍 Predict Stock Prices
@@ -93,7 +93,7 @@ const AnalysisPrediction = () => {
         </Button>
       </Paper>
 
-      {/* 📌 Display Prediction Graph */}
+      {/* Display Prediction Graph */}
       {plotData && (
         <Box mt={3}>
           <Plot
@@ -113,15 +113,15 @@ const AnalysisPrediction = () => {
               },
               template: "plotly_dark",
               hovermode: "x unified",
-              height: 700, // 🔥 Make graph bigger
+              height: 700,
               showlegend: true,
             }}
             config={{
-              scrollZoom: true, // 🔍 Allow zooming
-              responsive: true, // 📱 Make it responsive
+              scrollZoom: true,
+              responsive: true,
             }}
             useResizeHandler
-            style={{ width: "100%", height: "700px" }} // 🔥 Adjust width & height dynamically
+            style={{ width: "100%", height: "700px" }}
           />
         </Box>
       )}

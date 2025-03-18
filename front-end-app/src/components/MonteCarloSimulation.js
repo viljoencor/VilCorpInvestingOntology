@@ -30,7 +30,7 @@ const MonteCarloSimulation = () => {
 
   return (
     <Container maxWidth="lg">
-      {/* ✅ Educational Section */}
+      {/*  Educational Section */}
       <Paper elevation={3} sx={{ padding: 3, marginBottom: 3, borderRadius: 2 }}>
         <Typography variant="h4" gutterBottom textAlign="center">
           📊 Monte Carlo Stock Price Simulation
@@ -43,12 +43,12 @@ const MonteCarloSimulation = () => {
         <Typography variant="h6" gutterBottom>
           🔹 Why is Monte Carlo Useful?
         </Typography>
-        <Typography variant="body1">✅ Risk Assessment – Helps investors see the best & worst cases.</Typography>
-        <Typography variant="body1">✅ Multiple Outcomes – Shows many possible price movements, not just one.</Typography>
-        <Typography variant="body1">✅ Better Decision-Making – Helps in long-term investing & options pricing.</Typography>
+        <Typography variant="body1"> Risk Assessment – Helps investors see the best & worst cases.</Typography>
+        <Typography variant="body1"> Multiple Outcomes – Shows many possible price movements, not just one.</Typography>
+        <Typography variant="body1"> Better Decision-Making – Helps in long-term investing & options pricing.</Typography>
       </Paper>
 
-      {/* 📌 User Input Section */}
+      {/* User Input Section */}
       <Paper elevation={3} sx={{ padding: 3, borderRadius: 2 }}>
         <Typography variant="h5" gutterBottom>
           🔍 Run a Monte Carlo Simulation
@@ -78,7 +78,7 @@ const MonteCarloSimulation = () => {
         </Button>
       </Paper>
 
-      {/* 📌 Display Prediction Results */}
+      {/* Display Prediction Results */}
       {prediction && (
         <Box mt={3} textAlign="center">
           <Paper elevation={3} sx={{ padding: 3, borderRadius: 2 }}>
@@ -99,7 +99,7 @@ const MonteCarloSimulation = () => {
         </Box>
       )}
 
-      {/* 📌 Display Monte Carlo Graph */}
+      {/* Display Monte Carlo Graph */}
       {plotData && (
         <Box mt={3}>
           <Plot 

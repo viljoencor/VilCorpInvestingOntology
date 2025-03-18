@@ -16,17 +16,17 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import json
 from rdflib import Graph, Namespace
+from textblob import TextBlob
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 
-# Add the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from data_etl_pipeline.graph_funcations import parse_rdf_file
 from data_etl_pipeline.sparql_queries import (
     financial_metrics_query
 )
 from data_etl_pipeline.data_extraction import StockPriceExtractor, NewsAPIExtractor, YahooFinanceExtractor
-from data_etl_pipeline.data_cleaning import clean_news_articles
 from data_etl_pipeline.generate_rdf import generate_rdf_for_stock 
 
 app = Flask(__name__)
@@ -83,13 +83,22 @@ def get_dynamic_stock_prices():
         historical_data.reset_index(inplace=True)
         historical_data.rename(columns={"Date": "isRecordedOn", "Close": "priceValue"}, inplace=True)
 
-        print("DEBUG: Stock Price Data", historical_data.head())  # 🚀 Debug Print
-
         return jsonify(historical_data[["isRecordedOn", "priceValue"]].to_dict(orient="records"))
 
     except Exception as e:
-        print("ERROR:", e)  # 🚀 Debug Print
         return jsonify({'error': str(e)}), 500
+
+def clean_news_articles(news_data, company_name):
+    if not isinstance(news_data, list):
+        raise ValueError("Expected a list of news articles.")
+
+    unique_articles = {article['title']: article for article in news_data if isinstance(article, dict)}
+    for article in unique_articles.values():
+        article['title'] = article.get('title', '').strip()
+        article['mentionsCompany'] = company_name if company_name.lower() in article['title'].lower() else None
+        article['sentimentScore'] = TextBlob(article['title']).sentiment.polarity
+
+    return list(unique_articles.values())
 
 @app.route('/run-pipeline', methods=['POST'])
 def run_pipeline():
@@ -105,35 +114,35 @@ def run_pipeline():
         start_date = data['start_date']
         end_date = data['end_date']
 
-        # ✅ Fetch stock prices (Ensures it returns a DataFrame)
+        #  Fetch stock prices (Ensures it returns a DataFrame)
         stock_extractor = StockPriceExtractor(ticker, start_date, end_date)
         stock_prices = stock_extractor.fetch_stock_prices()
 
-        # ✅ Debugging Print
+        #  Debugging Print
         print(f"DEBUG: stock_prices type: {type(stock_prices)}")
 
-        # ✅ Ensure stock_prices is a DataFrame
+        #  Ensure stock_prices is a DataFrame
         if not isinstance(stock_prices, pd.DataFrame):
-            print("🚨 ERROR: Expected DataFrame but got:", type(stock_prices))
+            print("ERROR: Expected DataFrame but got:", type(stock_prices))
             return jsonify({"error": "Internal Server Error: Stock Prices Data Issue"}), 500
 
-        # ✅ Fix potential list indexing error
+        #  Fix potential list indexing error
         if "isRecordedOn" in stock_prices:
             stock_prices["isRecordedOn"] = pd.to_datetime(stock_prices["isRecordedOn"]).dt.tz_localize(None)
 
-        # ✅ Fetch news articles
+        #  Fetch news articles
         news_extractor = NewsAPIExtractor(api_key="d745b20dc64046fb9e52cc8e407427b2", company=company_name, start_date=start_date, end_date=end_date)
         news_articles = clean_news_articles(news_extractor.fetch_news_articles(), company_name)
 
-        # ✅ Fetch financial metrics
+        #  Fetch financial metrics
         yahoo_extractor = YahooFinanceExtractor(ticker)
         financial_metrics = yahoo_extractor.fetch_financial_metrics()
 
-        # ✅ Fetch performance overview
+        #  Fetch performance overview
         performance_overview = yahoo_extractor.fetch_performance_overview()
 
         return jsonify({
-            "stock_prices": stock_prices.to_dict(orient="records"),  # ✅ Always return list
+            "stock_prices": stock_prices.to_dict(orient="records"),  #  Always return list
             "news_insights": news_articles,
             "financial_metrics": financial_metrics,
             "performance_overview": performance_overview
@@ -195,10 +204,10 @@ def predict_stock_prices_linear():
             "predicted_price": round(predicted_prices[i], 2)
         } for i in range(len(predicted_prices))]
 
-        # ✅ Create a more engaging Plotly figure
+        #  Create a more engaging Plotly figure
         fig = go.Figure()
 
-        # 📌 Add historical stock prices
+        # Add historical stock prices
         fig.add_trace(go.Scatter(
             x=historical_data['Date'],
             y=historical_data['Close'],
@@ -208,7 +217,7 @@ def predict_stock_prices_linear():
             hovertemplate="Date: %{x} <br>Price: $%{y}"
         ))
 
-        # 📌 Add predicted prices with confidence band
+        # Add predicted prices with confidence band
         fig.add_trace(go.Scatter(
             x=[datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=i) for i in range(1, days + 1)],
             y=predicted_prices,
@@ -218,7 +227,7 @@ def predict_stock_prices_linear():
             hovertemplate="Date: %{x} <br>Predicted Price: $%{y}"
         ))
 
-        # 📌 Add confidence interval (±5% margin)
+        # Add confidence interval (±5% margin)
         lower_bound = predicted_prices * 0.95
         upper_bound = predicted_prices * 1.05
         fig.add_trace(go.Scatter(
@@ -240,7 +249,7 @@ def predict_stock_prices_linear():
             hoverinfo="skip"
         ))
 
-        # 🎨 Enhance graph layout
+        # Enhance graph layout
         fig.update_layout(
             title=f"Stock Price Prediction for {ticker} (Linear Regression)",
             xaxis_title="Time",
@@ -283,21 +292,21 @@ def predict_stock_prices_polynomial():
         X = historical_data[['days_since_start']]
         y = historical_data['Close']
 
-        # ✅ Train Polynomial Regression Model (Degree = 3 for flexibility)
+        #  Train Polynomial Regression Model (Degree = 3 for flexibility)
         poly_model = make_pipeline(PolynomialFeatures(degree=3), LinearRegression())
         poly_model.fit(X, y)
 
-        # ✅ Predict future prices
+        #  Predict future prices
         future_dates = pd.DataFrame({'days_since_start': [(X['days_since_start'].max() + i) for i in range(1, days + 1)]})
         predicted_prices = poly_model.predict(future_dates[['days_since_start']])
 
         predictions = [{"date": (datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=i)).strftime('%Y-%m-%d'),
                         "predicted_price": round(predicted_prices[i], 2)} for i in range(len(predicted_prices))]
 
-        # ✅ Create an engaging Plotly figure
+        #  Create an engaging Plotly figure
         fig = go.Figure()
 
-        # 📌 Add historical stock prices
+        # Add historical stock prices
         fig.add_trace(go.Scatter(
             x=historical_data['Date'],
             y=historical_data['Close'],
@@ -307,7 +316,7 @@ def predict_stock_prices_polynomial():
             hovertemplate="Date: %{x} <br>Price: $%{y}"
         ))
 
-        # 📌 Add predicted prices with confidence bands
+        # Add predicted prices with confidence bands
         fig.add_trace(go.Scatter(
             x=[datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=i) for i in range(1, days + 1)],
             y=predicted_prices,
@@ -317,7 +326,7 @@ def predict_stock_prices_polynomial():
             hovertemplate="Date: %{x} <br>Predicted Price: $%{y}"
         ))
 
-        # 📌 Add confidence interval (±5% margin)
+        # Add confidence interval (±5% margin)
         lower_bound = predicted_prices * 0.95
         upper_bound = predicted_prices * 1.05
         fig.add_trace(go.Scatter(
@@ -339,7 +348,7 @@ def predict_stock_prices_polynomial():
             hoverinfo="skip"
         ))
 
-        # 🎨 Enhance graph layout
+        # Enhance graph layout
         fig.update_layout(
             title=f"Stock Price Prediction for {ticker} (Polynomial Regression)",
             xaxis_title="Time",
@@ -354,7 +363,7 @@ def predict_stock_prices_polynomial():
         return jsonify({
             "status": "success",
             "predictions": predictions,
-            "plot_data": plot_data_json  # 🔥 Ensure plot_data is always included
+            "plot_data": plot_data_json  #  Ensure plot_data is always included
         })
 
     except Exception as e:
@@ -449,10 +458,6 @@ def investment_insights():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
-
-
 RDF_STORAGE_DIR = os.path.join(os.getcwd(), "rdf_data")
 os.makedirs(RDF_STORAGE_DIR, exist_ok=True) 
 
@@ -471,9 +476,25 @@ FUSEKI_ENDPOINT = "http://localhost:3030/financial-data"
 rdf_graph = Graph()
 rdf_graph.parse("ontology/financial_ontology.ttl", format="turtle")
 
+@app.route('/rdf-graph-data', methods=['GET'])
+def get_rdf_graph_data():
+    try:
+        ticker = request.args.get("ticker")
+        if not ticker:
+            return jsonify({"error": "Missing ticker parameter"}), 400
 
+        # You can optionally support a 'years' parameter. Here default is "5y"
+        years = request.args.get("years", "5y")
+        rdf_file = os.path.join(RDF_STORAGE_DIR, f"{ticker}_{years}.ttl")
+        
+        if not os.path.exists(rdf_file):
+            return jsonify({"error": f"RDF file for {ticker} not found at {rdf_file}"}), 404
+        
+        graph_data = parse_rdf_file(rdf_file)
+        return jsonify(graph_data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-# 2. Storing RDF in Fuseki
 def store_rdf_in_fuseki(graph):
     """Uploads RDF data to Apache Fuseki."""
     headers = {"Content-Type": "text/turtle"}
@@ -492,9 +513,6 @@ def store_rdf():
     success = store_rdf_in_fuseki(rdf_data)
     return jsonify({"status": "success" if success else "failed"})
 
-
-# 🔹 3. Running SPARQL Queries on RDF Data
-# -----------------------------------------------
 def run_sparql_query(query):
     """Executes a SPARQL query against the RDF knowledge graph."""
     try:
@@ -517,25 +535,24 @@ def get_rdf_stock_data():
     rdf_file_path = get_rdf_file_path(ticker, years)
 
     if not os.path.exists(rdf_file_path):
-        print(f"🚨 RDF for {ticker} ({years} years) not found. Generating RDF...")
+        print(f"RDF for {ticker} ({years} years) not found. Generating RDF...")
         rdf_data = generate_rdf_for_stock(ticker, years)
 
         if rdf_data:
             with open(rdf_file_path, "w", encoding="utf-8") as rdf_file:
                 rdf_file.write(rdf_data)
-            print(f"✅ RDF saved at {rdf_file_path}")
+            print(f"RDF saved at {rdf_file_path}")
         else:
-            print(f"❌ Failed to generate RDF for {ticker}. Check logs for errors.")
+            print(f"Failed to generate RDF for {ticker}. Check logs for errors.")
             return jsonify({"error": f"Failed to generate RDF for {ticker}"}), 500
 
-    # ✅ Load RDF Graph from file
+    #  Load RDF Graph from file
     rdf_graph = rdflib.Graph()
     rdf_graph.parse(rdf_file_path, format="turtle")
 
     json_data = parse_rdf_to_json(rdf_graph)
 
     return jsonify(json_data)
-
 
 def parse_rdf_to_json(rdf_graph):
     """Convert RDF Graph to JSON for frontend visualization"""
@@ -559,9 +576,6 @@ def parse_rdf_to_json(rdf_graph):
     json_data["nodes"] = list(node_labels.values())
     return json_data
 
-# -----------------------------------------------
-# 🔹 4. Fetch Financial Ontology as JSON
-# -----------------------------------------------
 @app.route('/financial-ontology', methods=['GET'])
 def get_financial_ontology():
     
@@ -578,16 +592,16 @@ def get_financial_ontology():
             stock_price = stock.info.get("currentPrice", "N/A")
             market_sentiment = "Positive" if stock.info.get("recommendationKey") == "buy" else "Neutral"
 
-            # ✅ Add company node
+            #  Add company node
             ontology_data["nodes"].append({"id": ticker, "label": ticker, "title": company_name, "shape": "box", "color": "#4caf50"})
 
-            # ✅ Add financial metric nodes
+            #  Add financial metric nodes
             for metric, value in [("P/E Ratio", pe_ratio), ("Revenue", revenue), ("Market Cap", market_cap), ("Stock Price", stock_price)]:
                 if value != "N/A":
                     ontology_data["nodes"].append({"id": f"{ticker}_{metric.replace(' ', '_')}", "label": metric, "title": f"{metric}: ${value}", "color": "#ff9800"})
                     ontology_data["edges"].append({"from": ticker, "to": f"{ticker}_{metric.replace(' ', '_')}", "label": "has metric"})
 
-            # ✅ Sentiment node
+            #  Sentiment node
             sentiment_color = "#9c27b0" if market_sentiment == "Positive" else "#d32f2f"
             ontology_data["nodes"].append({"id": f"{ticker}_sentiment", "label": "Market Sentiment", "title": market_sentiment, "color": sentiment_color})
             ontology_data["edges"].append({"from": ticker, "to": f"{ticker}_sentiment", "label": "has sentiment"})
@@ -597,29 +611,20 @@ def get_financial_ontology():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 def load_rdf_graph():
     """Loads RDF Graph and ensures all necessary namespaces are bound."""
     g = Graph()
     g.bind("ex", EX)
-    g.bind("xsd", XSD_NS)  # ✅ Explicitly bind xsd
+    g.bind("xsd", XSD_NS)  #  Explicitly bind xsd
 
     try:
         g.parse("ontology/financial_ontology.ttl", format="turtle")
-        print("✅ RDF Graph Loaded Successfully!")
+        print(" RDF Graph Loaded Successfully!")
         return g
     except Exception as e:
-        print(f"🚨 ERROR: {e}")
+        print(f"ERROR: {e}")
         return None
 rdf_graph = load_rdf_graph()
 
-
-
-
-
-
-# -----------------------------------------------
-# 🔹 5. Flask App Runner
-# -----------------------------------------------
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

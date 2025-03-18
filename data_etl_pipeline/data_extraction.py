@@ -22,20 +22,20 @@ class StockPriceExtractor:
             stock = yf.Ticker(self.ticker)
             historical_data = stock.history(period=period)
 
-            # ✅ Check if data is empty
+            #  Check if data is empty
             if historical_data.empty:
                 print(f"⚠️ No stock price data found for {self.ticker}. Returning empty DataFrame.")
                 return pd.DataFrame(columns=["isRecordedOn", "priceValue", "volume"])
 
-            # ✅ Ensure DataFrame format
+            #  Ensure DataFrame format
             historical_data.reset_index(inplace=True)
             historical_data.rename(columns={"Date": "isRecordedOn", "Close": "priceValue", "Volume": "volume"}, inplace=True)
 
             return historical_data[["isRecordedOn", "priceValue", "volume"]]
 
         except Exception as e:
-            print(f"🚨 ERROR fetching stock prices for {self.ticker}: {e}")
-            return pd.DataFrame(columns=["isRecordedOn", "priceValue", "volume"])  # ✅ Always return DataFrame
+            print(f"ERROR fetching stock prices for {self.ticker}: {e}")
+            return pd.DataFrame(columns=["isRecordedOn", "priceValue", "volume"])  #  Always return DataFrame
 
 class NewsAPIExtractor:
     def __init__(self, api_key, company, start_date, end_date):
