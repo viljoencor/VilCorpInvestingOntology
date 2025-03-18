@@ -1,4 +1,3 @@
-# finnhub_api.py
 import os
 import requests
 import json
@@ -42,7 +41,7 @@ def get_finnhub_data():
         "profile": profile_data,
         "financials": financials_data,
         "secFilings": sec_filings_data,
-        "insider": insider_data,  # New key for insider transactions / institutional holdings
+        "insider": insider_data,
         "news": news_data,
         "wikidata": wikidata_data
     })

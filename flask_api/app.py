@@ -207,7 +207,7 @@ def predict_stock_prices_linear():
         #  Create a more engaging Plotly figure
         fig = go.Figure()
 
-        # 📌 Add historical stock prices
+        # Add historical stock prices
         fig.add_trace(go.Scatter(
             x=historical_data['Date'],
             y=historical_data['Close'],
@@ -217,7 +217,7 @@ def predict_stock_prices_linear():
             hovertemplate="Date: %{x} <br>Price: $%{y}"
         ))
 
-        # 📌 Add predicted prices with confidence band
+        # Add predicted prices with confidence band
         fig.add_trace(go.Scatter(
             x=[datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=i) for i in range(1, days + 1)],
             y=predicted_prices,
@@ -227,7 +227,7 @@ def predict_stock_prices_linear():
             hovertemplate="Date: %{x} <br>Predicted Price: $%{y}"
         ))
 
-        # 📌 Add confidence interval (±5% margin)
+        # Add confidence interval (±5% margin)
         lower_bound = predicted_prices * 0.95
         upper_bound = predicted_prices * 1.05
         fig.add_trace(go.Scatter(
@@ -249,7 +249,7 @@ def predict_stock_prices_linear():
             hoverinfo="skip"
         ))
 
-        # 🎨 Enhance graph layout
+        # Enhance graph layout
         fig.update_layout(
             title=f"Stock Price Prediction for {ticker} (Linear Regression)",
             xaxis_title="Time",
@@ -306,7 +306,7 @@ def predict_stock_prices_polynomial():
         #  Create an engaging Plotly figure
         fig = go.Figure()
 
-        # 📌 Add historical stock prices
+        # Add historical stock prices
         fig.add_trace(go.Scatter(
             x=historical_data['Date'],
             y=historical_data['Close'],
@@ -316,7 +316,7 @@ def predict_stock_prices_polynomial():
             hovertemplate="Date: %{x} <br>Price: $%{y}"
         ))
 
-        # 📌 Add predicted prices with confidence bands
+        # Add predicted prices with confidence bands
         fig.add_trace(go.Scatter(
             x=[datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=i) for i in range(1, days + 1)],
             y=predicted_prices,
@@ -326,7 +326,7 @@ def predict_stock_prices_polynomial():
             hovertemplate="Date: %{x} <br>Predicted Price: $%{y}"
         ))
 
-        # 📌 Add confidence interval (±5% margin)
+        # Add confidence interval (±5% margin)
         lower_bound = predicted_prices * 0.95
         upper_bound = predicted_prices * 1.05
         fig.add_trace(go.Scatter(
@@ -348,7 +348,7 @@ def predict_stock_prices_polynomial():
             hoverinfo="skip"
         ))
 
-        # 🎨 Enhance graph layout
+        # Enhance graph layout
         fig.update_layout(
             title=f"Stock Price Prediction for {ticker} (Polynomial Regression)",
             xaxis_title="Time",
@@ -458,10 +458,6 @@ def investment_insights():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
-
-
 RDF_STORAGE_DIR = os.path.join(os.getcwd(), "rdf_data")
 os.makedirs(RDF_STORAGE_DIR, exist_ok=True) 
 
@@ -517,7 +513,6 @@ def store_rdf():
     success = store_rdf_in_fuseki(rdf_data)
     return jsonify({"status": "success" if success else "failed"})
 
-
 def run_sparql_query(query):
     """Executes a SPARQL query against the RDF knowledge graph."""
     try:
@@ -558,7 +553,6 @@ def get_rdf_stock_data():
     json_data = parse_rdf_to_json(rdf_graph)
 
     return jsonify(json_data)
-
 
 def parse_rdf_to_json(rdf_graph):
     """Convert RDF Graph to JSON for frontend visualization"""
@@ -617,7 +611,6 @@ def get_financial_ontology():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 def load_rdf_graph():
     """Loads RDF Graph and ensures all necessary namespaces are bound."""
     g = Graph()
@@ -632,7 +625,6 @@ def load_rdf_graph():
         print(f"ERROR: {e}")
         return None
 rdf_graph = load_rdf_graph()
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

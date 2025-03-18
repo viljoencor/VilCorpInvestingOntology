@@ -17,7 +17,8 @@ import axios from "axios";
 import StockPriceChart from "./StockPriceChart";
 import InvestmentSummary from "./InvestmentSummary";
 import LoadingSpinner from "./LoadingSpinner";
-import LinkedDataExplorer from "./LinkedDataExplorer"; // Import the new component
+import LinkedDataExplorer from "./LinkedDataExplorer";
+
 
 const PipelineInputForm = () => {
   const [tickers, setTickers] = useState("");
@@ -152,10 +153,11 @@ const PipelineInputForm = () => {
 
           <Box hidden={tabIndex !== 0}>
             <Typography variant="h6">Investment Summary</Typography>
+            {/* Other option with calculations you can use PipelineInputForm */}
             <Grid container spacing={2}>
               {Object.keys(results).map((ticker) => (
                 <Grid item xs={12} md={6} key={ticker}>
-                  <InvestmentSummary
+                  <InvestmentSummary 
                     ticker={ticker}
                     results={results}
                     financialStatistics={financialStatistics}
